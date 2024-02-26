@@ -62,19 +62,19 @@
 Sistēmas ekrānu skices:
 * Iekārtu apskatīšanas skice (skat. 1. att.)
 
-![1. att.](![https://media.discordapp.net/attachments/1210559886694547487/1210562381558841374/dp41-nef1.jpg?ex=65eb0312&is=65d88e12&hm=2a7eadbbaf30407f1e5439c03da03a6a3a3f06a00d2431c3a3d29fa736f1f59b&=&format=webp&width=515&height=651](image.png) "1. att.")
+![1. att.](https://media.discordapp.net/attachments/1210559886694547487/1210562381558841374/dp41-nef1.jpg?ex=65eb0312&is=65d88e12&hm=2a7eadbbaf30407f1e5439c03da03a6a3a3f06a00d2431c3a3d29fa736f1f59b&=&format=webp&width=515&height=651 "1. att.")
  
 Sākumlapa skice (1. att.)
 
 * Pievienot jaunu atrašanās vietu skice (skat. 2. att.)
 
- ![2. att.](![https://media.discordapp.net/attachments/1210559886694547487/1210562381558841374/dp41-nef1.jpg?ex=65eb0312&is=65d88e12&hm=2a7eadbbaf30407f1e5439c03da03a6a3a3f06a00d2431c3a3d29fa736f1f59b&=&format=webp&width=515&height=651](image.png) "2. att.")
+ ![2. att.](https://media.discordapp.net/attachments/1210559886694547487/1210562381558841374/dp41-nef1.jpg?ex=65eb0312&is=65d88e12&hm=2a7eadbbaf30407f1e5439c03da03a6a3a3f06a00d2431c3a3d29fa736f1f59b&=&format=webp&width=515&height=651 "2. att.")
 
 Pievienot jaunu atrašanās vietu skice (2. att.)
 
 * Vietu meklēšanas kartē lapa skice (skat. 3. att.)
 
-![3. att.](![https://media.discordapp.net/attachments/1210559886694547487/1210562381558841374/dp41-nef1.jpg?ex=65eb0312&is=65d88e12&hm=2a7eadbbaf30407f1e5439c03da03a6a3a3f06a00d2431c3a3d29fa736f1f59b&=&format=webp&width=515&height=651](image.png) "3. att.")
+![3. att.](https://media.discordapp.net/attachments/1210559886694547487/1210562381558841374/dp41-nef1.jpg?ex=65eb0312&is=65d88e12&hm=2a7eadbbaf30407f1e5439c03da03a6a3a3f06a00d2431c3a3d29fa736f1f59b&=&format=webp&width=515&height=651 "3. att.")
  
 Vietu meklēšanas kartē lapa skice 3. att.
 
