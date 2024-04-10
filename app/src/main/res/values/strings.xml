@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Underground Riga</string>
+    <string name="my_map_api_key">AIzaSyCqAMK4i9UmVQAMjF0UJjNtQPN38_MChLY</string>
+    <string name="title_activity_maps_bottom">MapsActivityBottom</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+</resources>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/rootLayout"
+    tools:context=".MapsActivity">
+
+    <fragment
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="com.google.android.gms.maps.SupportMapFragment" />
+
+    <ImageView
+        android:id="@+id/ivFocusOnLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#16355A"
+        android:layout_gravity="bottom|left"
+        android:src="@drawable/ic_current_location_button"
+        android:layout_margin="16dp"
+/>
+
+    <ImageView
+        android:id="@+id/zoomOutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#16355A"
+        android:layout_gravity="bottom|left"
+        android:layout_marginBottom="40dp"
+        android:src="@drawable/minus_3108"
+        android:layout_marginLeft="15dp"
+
+        />
+
+
+    <ImageView
+        android:id="@+id/ivMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="menu"
+        android:src="@drawable/ic_hamburger_black"
+        android:textColor="@color/white"
+        android:backgroundTint="#16355A"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="80dp"
+        android:layout_marginRight="20dp"
+        />
+
+    <Button
+        android:id="@+id/bHideMenu"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:text="" />
+
+    <LinearLayout
+        android:id="@+id/vMenu"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_menu_bg_lampa"
+        android:layout_gravity="right"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/idTVUserName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:gravity="center"
+            android:padding="4dp"
+            android:text="User Name"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textSize="20sp"
+            android:textColor="#FFFFFF"
+            android:fontFamily="@font/font_family_nunito" />
+
+        <Button
+            android:id="@+id/mySuggestPlace"
+            android:layout_width="191dp"
+            android:layout_height="45dp"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="331dp"
+            android:text="Suggest Place"
+            android:backgroundTint="#E1F1F3"
+            android:textColor="@color/black"/>
+
+        <Button
+            android:id="@+id/idBtnLogOut"
+            android:layout_width="124dp"
+            android:layout_height="53dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginEnd="20dp"
+            android:padding="5dp"
+            android:text="Logout"
+            android:textSize="18sp"
+            android:layout_gravity="center"
+            android:textColor="@color/black"
+            android:backgroundTint="#A7D1D2"
+            android:textAllCaps="false" />
+
+
+
+
+    </LinearLayout>
+
+</FrameLayout>

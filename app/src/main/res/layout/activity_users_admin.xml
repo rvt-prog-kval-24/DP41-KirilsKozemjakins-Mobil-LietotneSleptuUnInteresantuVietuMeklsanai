@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#16355A"
+    tools:context=".UsersActivityAdmin">
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/gray_light"
+            android:fontFamily="@font/font_family_nunito"
+            android:onClick="goToMain"
+            android:text="X"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/etUsername"
+            android:layout_width="245dp"
+            android:layout_height="53dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/bg_logbar"
+            android:fontFamily="@font/font_family_nunito"
+            android:inputType="textPersonName"
+            android:maxLength="12"
+            android:paddingLeft="60dp"
+            android:layout_gravity="center_horizontal"
+            android:hint="Username"
+/>
+
+        <EditText
+            android:id="@+id/etEmail"
+            android:layout_width="245dp"
+            android:layout_height="53dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/bar_email"
+            android:fontFamily="@font/font_family_nunito"
+            android:inputType="textEmailAddress"
+            android:paddingLeft="60dp"
+            android:layout_gravity="center_horizontal"
+            android:hint="Email"/>
+
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="245dp"
+            android:layout_height="53dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/bar_password"
+            android:fontFamily="@font/font_family_nunito"
+            android:paddingLeft="60dp"
+            android:maxLength="16"
+            android:layout_gravity="center_horizontal"
+            android:hint="Password"/>
+
+        <EditText
+            android:id="@+id/etRole"
+            android:layout_width="245dp"
+            android:layout_height="53dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/bar_role"
+            android:fontFamily="@font/font_family_nunito"
+            android:paddingLeft="60dp"
+            android:maxLength="1"
+            android:layout_gravity="center_horizontal"
+            android:hint="Role"/>
+
+        <Button
+            android:id="@+id/btn_insert"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:padding="10dp"
+            android:backgroundTint="#A7D1D2"
+            android:textColor="@color/black"
+            android:text="Insert" />
+
+    </LinearLayout>
+    <TextView
+        android:id="@+id/tvAboutField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="For any changes use this field bellow:"
+        android:fontFamily="@font/font_family_nunito"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textAlignment="center"/>
+
+    <EditText
+        android:id="@+id/etUserId"
+        android:layout_width="245dp"
+        android:layout_height="53dp"
+        android:layout_margin="10dp"
+        android:background="@drawable/bar_role"
+        android:fontFamily="@font/font_family_nunito"
+        android:paddingLeft="60dp"
+        android:maxLength="1"
+        android:layout_gravity="center_horizontal"
+        android:hint="UserId"
+        android:inputType="number" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="3">
+
+        <Button
+            android:id="@+id/btn_read"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#A7D1D2"
+            android:textColor="@color/black"
+            android:text="Read"/>
+        <Button
+            android:id="@+id/btn_update"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#A7D1D2"
+            android:textColor="@color/black"
+            android:text="Update"/>
+        <Button
+            android:id="@+id/btn_delete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#A7D1D2"
+            android:textColor="@color/black"
+            android:text="Delete"/>
+
+
+
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tvResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/font_family_nunito"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"/>
+
+
+
+    </ScrollView>
+
+
+
+</LinearLayout>

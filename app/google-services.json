@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "716429145792",
+    "project_id": "hidden-riga",
+    "storage_bucket": "hidden-riga.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:716429145792:android:adb32856925e9f817b5f25",
+        "android_client_info": {
+          "package_name": "com.undergroundriga"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcvOknRLMSFyTVnI6HZw2y7MjI6OgCpKE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
