@@ -33,6 +33,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.location.LocationListener
+import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 
@@ -113,6 +114,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
     private fun initializeViews() {
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
 
         vMenu = findViewById(R.id.vMenu)
         bHideMenu = findViewById(R.id.bHideMenu)
@@ -345,6 +347,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
 
         vMenu.layoutParams = layoutParams
         bHideMenu.layoutParams = layoutParamsB
+    }
+
+    fun goToSuggest(view: View) {
+        val intent = Intent(this, ActivityMapsSuggestionAdd::class.java)
+        startActivity(intent)
     }
 
 

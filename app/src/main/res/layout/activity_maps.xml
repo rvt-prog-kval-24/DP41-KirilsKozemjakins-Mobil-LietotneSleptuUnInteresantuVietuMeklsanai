@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,11 +9,13 @@
     android:id="@+id/rootLayout"
     tools:context=".MapsActivity">
 
-    <fragment
+    <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
+        class="com.google.android.gms.maps.SupportMapFragment"
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.google.android.gms.maps.SupportMapFragment" />
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        map:mapId="@string/map_id"/>
 
     <ImageView
         android:id="@+id/ivFocusOnLocation"
@@ -90,6 +93,7 @@
             android:layout_marginStart="30dp"
             android:layout_marginTop="331dp"
             android:text="Suggest Place"
+            android:onClick="goToSuggest"
             android:backgroundTint="#E1F1F3"
             android:textColor="@color/black"/>
 

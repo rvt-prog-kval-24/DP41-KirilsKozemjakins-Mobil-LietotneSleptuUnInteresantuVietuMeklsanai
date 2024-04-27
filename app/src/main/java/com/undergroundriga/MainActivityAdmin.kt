@@ -34,4 +34,10 @@ class MainActivityAdmin : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
+
+    fun goToMainAdmin(view: View) {
+        val intent = Intent(this, MainActivityAdmin::class.java)
+        startActivity(intent)
+        finish()
+    }
 }

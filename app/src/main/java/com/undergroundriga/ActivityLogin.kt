@@ -5,14 +5,10 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
-import android.text.TextUtils
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.FirebaseApp
-import com.google.firebase.ktx.Firebase
-
 
 class ActivityLogin : AppCompatActivity() {
 
@@ -22,6 +18,7 @@ class ActivityLogin : AppCompatActivity() {
     lateinit var sharedPreferences: SharedPreferences
 
     var PREFS_KEY = "prefs"
+    var USER_ID_KEY = "user_id"
     var USER_KEY = "user"
     var PWD_KEY = "pwd"
 
@@ -31,7 +28,6 @@ class ActivityLogin : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-
 
         passwordEditText = findViewById(R.id.etPassword)
         usernameEditText = findViewById(R.id.etUsername)
@@ -64,20 +60,23 @@ class ActivityLogin : AppCompatActivity() {
         for (i in 0 until data.size) {
             val user = data[i]
             if (user.username == username && user.password == password) {
-                val intent: Intent
-                if (user.role == "1") {
-                    intent = Intent(this, MainActivityAdmin::class.java)
-                } else {
-                    intent = Intent(this, MapsActivity::class.java)
+                val intent = when (user.role) {
+                    "1" -> Intent(this, MainActivityAdmin::class.java)
+                    else -> Intent(this, MapsActivity::class.java)
                 }
+                // Save user ID in SharedPreferences
+                val editor: SharedPreferences.Editor = sharedPreferences.edit()
+                editor.putInt(USER_ID_KEY, user.id)
+                editor.apply()
+
                 startActivity(intent)
+                finish()
                 return true
             }
         }
 
         return false
     }
-
 
     fun goToMain(view: View) {
         val intent = Intent(this, MainActivity::class.java)

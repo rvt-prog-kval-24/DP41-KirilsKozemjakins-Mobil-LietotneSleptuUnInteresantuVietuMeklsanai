@@ -24,33 +24,49 @@ const val COL_POSX = "PosX"
 const val COL_POSY = "PosY"
 const val COL_TAG = "Tag"
 
+const val TABLE_NAME_SUGGESTIONS = "MapsPlacesSuggestions"
+const val COL_PLACESID_SUGGESTION= "PlacesId"
+const val COL_PLACENAME_SUGGESTION = "PlaceName"
+const val COL_DESCRIPTION_SUGGESTION = "Description"
+const val COL_AUTHOR_ID_SUGGESTION = "AuthorID"
+const val COL_POSX_SUGGESTION = "PosX"
+const val COL_POSY_SUGGESTION = "PosY"
+const val COL_TAG_SUGGESTION = "Tag"
+
 class DataBaseHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, 1) {
 
 
     override fun onCreate(db: SQLiteDatabase?) {
-        val createTableUsers = "CREATE TABLE " + TABLE_NAME + "(" +
-                COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COL_USERNAME + " VARCHAR(12), " +
-                COL_PASSWORD + " VARCHAR(15), " +
-                COL_EMAIL + " VARCHAR(25), " +
-                COL_ROLE + " VARCHAR(1));"
+        val createTableUsers = "CREATE TABLE $TABLE_NAME (" +
+                "$COL_ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "$COL_USERNAME VARCHAR(12), " +
+                "$COL_PASSWORD VARCHAR(15), " +
+                "$COL_EMAIL VARCHAR(25), " +
+                "$COL_ROLE VARCHAR(1));"
 
-        val createTablePlaces = "CREATE TABLE " + TABLE_NAME_MAPS + "(" +
-                COL_PLACESID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COL_PLACENAME + " TEXT, " +
-                COL_DESCRIPTION  + " TEXT, " +
-                COL_TAG  + " TEXT, " +
-                COL_POSX  + " TEXT, " +
-                COL_POSY + " TEXT);"
+        val createTablePlaces = "CREATE TABLE $TABLE_NAME_MAPS (" +
+                "$COL_PLACESID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "$COL_PLACENAME TEXT, " +
+                "$COL_DESCRIPTION TEXT, " +
+                "$COL_TAG TEXT, " +
+                "$COL_POSX TEXT, " +
+                "$COL_POSY TEXT);"
 
+        val createTablePlacesSuggestions = "CREATE TABLE $TABLE_NAME_SUGGESTIONS (" +
+                "$COL_PLACESID_SUGGESTION INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "$COL_PLACENAME_SUGGESTION TEXT, " +
+                "$COL_DESCRIPTION_SUGGESTION TEXT, " +
+                "$COL_AUTHOR_ID_SUGGESTION INTEGER, " +
+                "$COL_TAG_SUGGESTION TEXT, " +
+                "$COL_POSX_SUGGESTION TEXT, " +
+                "$COL_POSY_SUGGESTION TEXT, " +
+                "FOREIGN KEY($COL_AUTHOR_ID_SUGGESTION) REFERENCES $TABLE_NAME($COL_ID));"
 
         db?.execSQL(createTableUsers)
         db?.execSQL(createTablePlaces)
-
-        /*val admin = User("admin","admin", "1")
-        insertData(admin)*/
-
+        db?.execSQL(createTablePlacesSuggestions)
     }
+
 
     fun isUsernameExists(username: String): Boolean {
         val db = this.readableDatabase
@@ -295,14 +311,60 @@ class DataBaseHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE
         }
     }
 
+    fun insertDataPlacesSuggestions(suggestPlace: SuggestPlace) {
+        val db = this.writableDatabase
+        val cv = ContentValues()
+
+        cv.put(COL_PLACENAME_SUGGESTION, suggestPlace.PlaceName)
+        cv.put(COL_DESCRIPTION_SUGGESTION, suggestPlace.Description)
+        cv.put(COL_AUTHOR_ID_SUGGESTION, suggestPlace.userId) // Changed from AuthorID to userId
+        cv.put(COL_TAG_SUGGESTION, suggestPlace.Tag)
+        cv.put(COL_POSX_SUGGESTION, suggestPlace.PosX)
+        cv.put(COL_POSY_SUGGESTION, suggestPlace.PosY)
+
+        val result = db.insert(TABLE_NAME_SUGGESTIONS, null, cv)
+
+        if (result == -1L) {
+            Toast.makeText(context, "Failed to insert suggestion", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(context, "Suggestion inserted successfully", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun getMySuggestions(userId: Int): List<SuggestPlace> {
+        val suggestions = mutableListOf<SuggestPlace>()
+        val db = this.readableDatabase
+        val query = "SELECT * FROM $TABLE_NAME_SUGGESTIONS WHERE $COL_AUTHOR_ID_SUGGESTION = ?"
+        val selectionArgs = arrayOf(userId.toString())
+        val result = db.rawQuery(query, selectionArgs)
+
+        if (result.moveToFirst()) {
+            do {
+                val placeId = result.getInt(result.getColumnIndex(COL_PLACESID_SUGGESTION))
+                val placeName = result.getString(result.getColumnIndex(COL_PLACENAME_SUGGESTION))
+                val description = result.getString(result.getColumnIndex(COL_DESCRIPTION_SUGGESTION))
+                val tag = result.getString(result.getColumnIndex(COL_TAG_SUGGESTION))
+                val posX = result.getString(result.getColumnIndex(COL_POSX_SUGGESTION))
+                val posY = result.getString(result.getColumnIndex(COL_POSY_SUGGESTION))
+                val suggestion = SuggestPlace(placeName, description, userId, tag, posX, posY)
+                suggestions.add(suggestion)
+            } while (result.moveToNext())
+        }
+
+        result.close()
+        db.close()
+        return suggestions
+    }
 
 
 
 
-/*56.9514998970168,
-  24.10635958457534
-* Zviedru vārti
-17. gadsimta vārti saglabājies viduslaiku pilsētas mūra posms.
-*
-sight*/
+
+
+    /*56.9514998970168,
+      24.10635958457534
+    * Zviedru vārti
+    17. gadsimta vārti saglabājies viduslaiku pilsētas mūra posms.
+    *
+    sight*/
 }

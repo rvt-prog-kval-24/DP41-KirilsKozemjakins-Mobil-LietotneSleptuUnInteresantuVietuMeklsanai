@@ -11,7 +11,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -22,13 +21,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UndergroundRiga"
         tools:targetApi="31">
-
+        <activity
+            android:name=".ActivityCheckMySuggestions"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityMapsSuggestionAdd"
+            android:exported="false" />
         <activity
             android:name=".MainActivityAdmin"
             android:exported="false" />
-        <activity android:name=".ActivityMapsEditData"
-            android:exported="false"/>
-
+        <activity
+            android:name=".ActivityMapsEditData"
+            android:exported="false" />
         <activity
             android:name=".UsersActivityAdmin"
             android:exported="false" />
@@ -36,7 +40,10 @@
             android:name=".MapsActivityAdmin"
             android:exported="false" />
         <activity
-            android:name=".ActivityMapsAdd"
+            android:name=".ActivityMapsSuggestionsAdd"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityMapsSuggestionsAddAdmin"
             android:exported="false" />
         <activity
             android:name=".ActivityReg"
