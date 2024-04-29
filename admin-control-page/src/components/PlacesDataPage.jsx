@@ -2,12 +2,12 @@
 
 import "../App.css";
 import React from 'react';
-import FirestoreCRUD from './Data/FirestoreCRUD';
+import AddPlaceForm from './Data/AddPlacesForm.jsx';
 
 const PlacesDataPage = () => {
-    const fields = ["PlaceName", "Description", "Tag", "PosX", "PosY", "AuthorID"];
+    const fields = ['PlaceName', 'Description', 'Tag', 'AuthorID'];
 
-    return <FirestoreCRUD collectionName="Places" fields={fields} />;
+    return <AddPlaceForm fields={fields} />;
 };
 
 export default PlacesDataPage;
