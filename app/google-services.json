@@ -1,13 +1,14 @@
 {
   "project_info": {
-    "project_number": "716429145792",
-    "project_id": "hidden-riga",
-    "storage_bucket": "hidden-riga.appspot.com"
+    "project_number": "1086149395268",
+    "firebase_url": "https://undergroundriga-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "undergroundriga",
+    "storage_bucket": "undergroundriga.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:716429145792:android:adb32856925e9f817b5f25",
+        "mobilesdk_app_id": "1:1086149395268:android:9dcba7826b97a76e068d11",
         "android_client_info": {
           "package_name": "com.undergroundriga"
         }
@@ -15,7 +16,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCcvOknRLMSFyTVnI6HZw2y7MjI6OgCpKE"
+          "current_key": "AIzaSyDDR_Hj_NUalzQUG8jMknrWMfDwZ0EP1hA"
         }
       ],
       "services": {

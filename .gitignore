@@ -12,7 +12,7 @@
 /captures
 .externalNativeBuild
 .cxx
-/node_modules
-/admin-control-page/node_modules
-node_modules/
+/admin-control-page/node_modules/*
+admin-control-page/node_modules/*
+node_modules/*
 node_modules
