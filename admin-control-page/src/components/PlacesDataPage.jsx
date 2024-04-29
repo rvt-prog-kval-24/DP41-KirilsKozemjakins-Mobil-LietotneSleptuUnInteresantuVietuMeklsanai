@@ -1,8 +1,13 @@
+// PlacesDataPage.jsx
+
+import "../App.css";
 import React from 'react';
+import FirestoreCRUD from './Data/FirestoreCRUD';
 
+const PlacesDataPage = () => {
+    const fields = ["PlaceName", "Description", "Tag", "PosX", "PosY", "AuthorID"];
 
-export default function LandingPage() {
-  return (
-    <p>Places</p>
-  );
+    return <FirestoreCRUD collectionName="Places" fields={fields} />;
 };
+
+export default PlacesDataPage;

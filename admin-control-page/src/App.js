@@ -12,6 +12,7 @@ import SuggestionsDataPage from "./components/SuggestionsDataPage.jsx"
 import UsersDataPage from "./components/UsersDataPage.jsx"
 
 
+
 const { Header, Content, Footer } = Layout;
 
 function Navbar() {

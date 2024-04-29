@@ -1,8 +1,12 @@
+// PlacesSuggestionsPage.jsx
+
 import React from 'react';
+import FirestoreCRUD from './Data/FirestoreCRUD';
 
+const PlacesSuggestionsPage = () => {
+    const fields = ["PlaceName", "Description", "userId", "Tag", "PosX", "PosY"];
 
-export default function LandingPage() {
-  return (
-    <p>Suggestions</p>
-  );
+    return <FirestoreCRUD collectionName="PlacesSuggestions" fields={fields} />;
 };
+
+export default PlacesSuggestionsPage;
