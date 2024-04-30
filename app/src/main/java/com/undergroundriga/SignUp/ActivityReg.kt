@@ -1,38 +1,40 @@
-package com.undergroundriga
+package com.undergroundriga.SignUp
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
-
-import android.util.Log
-import com.google.firebase.firestore.FirebaseFirestore
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.firebase.auth.GoogleAuthProvider
-
-import android.app.Activity
+import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseUser
-
+import com.google.firebase.auth.GoogleAuthProvider.*
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.Timestamp
-import com.undergroundriga.SignUp.ActivityReg
+import com.undergroundriga.MainActivity
+import com.undergroundriga.R
+import com.undergroundriga.User
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.undergroundriga.ActivityLogin
+import com.undergroundriga.EmailSignUpActivity
 
-private const val TAG = "Main"
 
-class MainActivity : AppCompatActivity() {
+private const val RC_SIGN_IN = 9001
 
+class ActivityReg : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_reg)
 
         val db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
@@ -166,6 +168,11 @@ class MainActivity : AppCompatActivity() {
 
     fun goToSignUp(view: View) {
         val intent = Intent(this, ActivityReg::class.java)
+        startActivity(intent)
+    }
+
+    fun goToMain(view: View) {
+        val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
     }
 

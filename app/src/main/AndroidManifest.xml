@@ -22,6 +22,9 @@
         android:theme="@style/Theme.UndergroundRiga"
         tools:targetApi="31">
         <activity
+            android:name=".EmailSignUpActivity"
+            android:exported="false" />
+        <activity
             android:name=".ActivityCheckMySuggestions"
             android:exported="false" />
         <activity
@@ -46,7 +49,7 @@
             android:name=".ActivityMapsSuggestionsAddAdmin"
             android:exported="false" />
         <activity
-            android:name=".ActivityReg"
+            android:name=".SignUp.ActivityReg"
             android:exported="false" />
         <activity
             android:name=".MapsActivity"
