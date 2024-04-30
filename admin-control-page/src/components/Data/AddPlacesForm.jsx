@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../DataBase/firebase';
-import { GoogleMap, Marker } from '@react-google-maps/api';
+import { GoogleMap, Marker, useGoogleMap } from '@react-google-maps/api';
 
 const AddPlaceForm = ({ fields }) => {
     const [formData, setFormData] = useState({});
@@ -55,9 +55,11 @@ const AddPlaceForm = ({ fields }) => {
         zoom: 15,
     };
 
-    const mapOnClick = map => {
+    const MapComponent = () => {
+        const map = useGoogleMap();
         mapRef.current = map;
         window.google.maps.event.addListener(map, 'click', handleMapClick);
+        return null;
     };
 
     return (
@@ -94,7 +96,8 @@ const AddPlaceForm = ({ fields }) => {
             <div>
                 <h3>Map</h3>
                 <div id="map" style={{ height: '400px', width: '100%' }}>
-                    <GoogleMap mapContainerStyle={{ height: '100%', width: '100%' }} options={mapOptions} onClick={mapOnClick}>
+                    <GoogleMap mapContainerStyle={{ height: '100%', width: '100%' }} options={mapOptions}>
+                        <MapComponent />
                         {latLng && <Marker position={latLng} />}
                     </GoogleMap>
                 </div>
