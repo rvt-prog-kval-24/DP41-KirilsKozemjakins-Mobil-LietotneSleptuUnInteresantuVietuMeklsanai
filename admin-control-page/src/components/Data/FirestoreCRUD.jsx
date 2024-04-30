@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import { db } from '../DataBase/firebase.jsx'; // Import db from firebase.jsx
 
-const FirestoreCRUD = ({ collectionName, fields }) => {
+const FirestoreCRUD = ({ collectionName, fields, convertTimestampsToStrings }) => {
     const [formData, setFormData] = useState({});
     const [data, setData] = useState([]);
 
@@ -13,7 +13,22 @@ const FirestoreCRUD = ({ collectionName, fields }) => {
     const fetchPosts = async () => {
         try {
             const querySnapshot = await getDocs(collection(db, collectionName));
-            const newData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+            const newData = querySnapshot.docs.map(doc => {
+                const docData = doc.data();
+                // Convert timestamp objects to string if required
+                if (convertTimestampsToStrings) {
+                    const formattedData = Object.keys(docData).reduce((acc, key) => {
+                        if (docData[key] instanceof Date) {
+                            acc[key] = docData[key].toLocaleString(); // Convert timestamp to string
+                        } else {
+                            acc[key] = docData[key];
+                        }
+                        return acc;
+                    }, {});
+                    return { ...formattedData, id: doc.id };
+                }
+                return { ...docData, id: doc.id };
+            });
             setData(newData);
         } catch (error) {
             console.error("Error fetching documents: ", error);

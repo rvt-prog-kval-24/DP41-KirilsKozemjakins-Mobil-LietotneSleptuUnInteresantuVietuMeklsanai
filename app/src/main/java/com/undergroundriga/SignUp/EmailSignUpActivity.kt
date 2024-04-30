@@ -30,9 +30,10 @@ class EmailSignUpActivity : AppCompatActivity() {
     private fun signUp() {
         val email = findViewById<EditText>(R.id.email).text.toString()
         val password = findViewById<EditText>(R.id.password).text.toString()
+        val passwordRep = findViewById<EditText>(R.id.repeatPassword).text.toString()
         val username = findViewById<EditText>(R.id.username).text.toString()
 
-        if (email.isEmpty() || password.isEmpty() || username.isEmpty()) {
+        if (email.isEmpty() || password.isEmpty() || passwordRep.isEmpty()  || username.isEmpty() || passwordRep!=password) {
             Toast.makeText(this, "Please fill all the fields", Toast.LENGTH_SHORT).show()
             return
         }

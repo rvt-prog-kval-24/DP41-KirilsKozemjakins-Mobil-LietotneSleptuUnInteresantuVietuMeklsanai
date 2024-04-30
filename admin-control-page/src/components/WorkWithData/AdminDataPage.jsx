@@ -1,7 +1,7 @@
 // AdminsPage.jsx
 
 import React from 'react';
-import FirestoreCRUD from './Data/FirestoreCRUD';
+import FirestoreCRUD from './../Data/FirestoreCRUD';
 
 const AdminsPage = () => {
     const fields = ["adminname", "password", "dateOfCreation"];
