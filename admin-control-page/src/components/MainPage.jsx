@@ -1,8 +1,14 @@
+//MainPage.jsx
+
 import React from 'react';
+import { Navigate } from 'react-router-dom'
 
+const MainPage = () => {
 
-export default function LandingPage() {
   return (
-    <p>Main</p>
+    <div>
+        <p>Main</p>
+    </div>
   );
 };
+export default MainPage

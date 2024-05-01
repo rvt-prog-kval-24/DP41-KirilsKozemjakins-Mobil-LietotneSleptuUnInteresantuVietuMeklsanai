@@ -12,6 +12,11 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.Timestamp
 
+import android.util.Log
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+import java.util.*
+
 class EmailSignUpActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
@@ -33,7 +38,7 @@ class EmailSignUpActivity : AppCompatActivity() {
         val passwordRep = findViewById<EditText>(R.id.repeatPassword).text.toString()
         val username = findViewById<EditText>(R.id.username).text.toString()
 
-        if (email.isEmpty() || password.isEmpty() || passwordRep.isEmpty()  || username.isEmpty() || passwordRep!=password) {
+        if (email.isEmpty() || password.isEmpty() || passwordRep.isEmpty()  || username.isEmpty() || passwordRep != password) {
             Toast.makeText(this, "Please fill all the fields", Toast.LENGTH_SHORT).show()
             return
         }
@@ -46,7 +51,7 @@ class EmailSignUpActivity : AppCompatActivity() {
                     Toast.makeText(this, "Email sign up successful", Toast.LENGTH_SHORT).show()
 
                     // Add user data to Firestore
-                    addUserToFirestore(user, email, username)
+                    addUserToFirestore(user, email, username, password)
 
                     // Send verification email
                     sendVerificationEmail(user)
@@ -57,17 +62,20 @@ class EmailSignUpActivity : AppCompatActivity() {
             }
     }
 
-    private fun addUserToFirestore(user: FirebaseUser?, email: String, username: String) {
+    private fun addUserToFirestore(user: FirebaseUser?, email: String, username: String, password: String) {
         // Access a Cloud Firestore instance
         val db = FirebaseFirestore.getInstance()
 
         // Get the current timestamp
         val timestamp = Timestamp.now()
 
+        // Hash the password
+        val hashedPassword = hashPassword(password)
+
         // Create a new user with email, hashed password, username, and dateOfFirstLogin
         val newUser = hashMapOf(
             "email" to email,
-            "password" to user?.uid, // Storing UID as password, this should be hashed for production
+            "password" to hashedPassword,
             "username" to username,
             "dateOfFirstLogin" to timestamp
             // Add more user data as needed
@@ -95,5 +103,24 @@ class EmailSignUpActivity : AppCompatActivity() {
                     Toast.makeText(this, "Failed to send verification email", Toast.LENGTH_SHORT).show()
                 }
             }
+    }
+
+    private fun hashPassword(password: String): String {
+        return try {
+            val md: MessageDigest = MessageDigest.getInstance("SHA-256")
+            val hash: ByteArray = md.digest(password.toByteArray())
+            val hexString = StringBuilder(2 * hash.size)
+            for (b in hash) {
+                val hex = Integer.toHexString(0xff and b.toInt())
+                if (hex.length == 1) {
+                    hexString.append('0')
+                }
+                hexString.append(hex)
+            }
+            hexString.toString()
+        } catch (e: NoSuchAlgorithmException) {
+            Log.e("Error", "Exception: ${e.message}")
+            ""
+        }
     }
 }
