@@ -13,7 +13,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.firebase.auth.GoogleAuthProvider
 
-import android.app.Activity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -21,7 +20,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseUser
 
 import com.google.firebase.Timestamp
-import com.undergroundriga.SignUp.ActivityReg
+import com.undergroundriga.ActivityReg
 
 private const val TAG = "Main"
 
@@ -50,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
         // Configure Google Sign In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("bob")
+            .requestIdToken("1086149395268-oji3l6dtoguqc6tj0d232j8firkg8sfg.apps.googleusercontent.com")
             .requestEmail()
             .build()
 

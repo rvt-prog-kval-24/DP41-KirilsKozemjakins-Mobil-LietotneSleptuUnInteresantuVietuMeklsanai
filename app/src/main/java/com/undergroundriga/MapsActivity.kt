@@ -7,7 +7,6 @@ import android.widget.TextView
 import android.widget.Button
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentManager
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -17,7 +16,6 @@ import com.google.android.gms.maps.model.MarkerOptions
 import android.content.SharedPreferences
 import android.location.Location
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import android.util.Log
 
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationCallback
@@ -34,7 +32,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.location.LocationListener
 import android.view.View
-import android.widget.ImageButton
 import android.widget.ImageView
 
 

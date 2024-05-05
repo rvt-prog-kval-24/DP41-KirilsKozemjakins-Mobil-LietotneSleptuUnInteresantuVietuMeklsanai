@@ -1,14 +1,12 @@
 package com.undergroundriga
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
-import android.os.Looper
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Button

@@ -1,11 +1,10 @@
-package com.undergroundriga.SignUp
+package com.undergroundriga
 
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -19,7 +18,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.Timestamp
 import com.undergroundriga.MainActivity
 import com.undergroundriga.R
-import com.undergroundriga.User
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.undergroundriga.ActivityLogin

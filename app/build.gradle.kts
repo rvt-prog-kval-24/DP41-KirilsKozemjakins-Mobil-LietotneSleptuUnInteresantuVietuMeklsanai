@@ -11,7 +11,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.undergroundriga"
+        applicationId = "com.underground.riga.app"
         minSdk = 24
         targetSdk = 33
         versionCode = 1
