@@ -18,16 +18,26 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseUser
-
+import android.content.Context
+import android.content.SharedPreferences
 import com.google.firebase.Timestamp
 import com.undergroundriga.ActivityReg
 
 private const val TAG = "Main"
 
+
+
+
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var sharedPreferences: SharedPreferences
+
+    var PREFS_KEY = "prefs"
+    var USER_ID_KEY = "user_id"
+    var USER_NAME_KEY = "user_name"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +45,13 @@ class MainActivity : AppCompatActivity() {
 
         val db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
+        sharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
+
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            // User is already signed in, navigate to MapsActivity
+            goToMapsActivity()
+        }
 
         val signInRequest = BeginSignInRequest.builder()
             .setGoogleIdTokenRequestOptions(
@@ -108,6 +125,12 @@ class MainActivity : AppCompatActivity() {
 
                     // Add user data to Firestore
                     addUserToFirestore(user)
+
+                    // Save user ID and name in SharedPreferences
+                    val editor: SharedPreferences.Editor = sharedPreferences.edit()
+                    editor.putString(USER_ID_KEY, user?.uid)
+                    editor.putString(USER_NAME_KEY, user?.displayName)
+                    editor.apply()
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithCredential:failure", task.exception)
@@ -127,7 +150,7 @@ class MainActivity : AppCompatActivity() {
         val db = FirebaseFirestore.getInstance()
 
         // Get the current timestamp
-        val timestamp = Timestamp.now()
+        val timestamp = (Timestamp.now()).toString()
 
         // Create a new user with a first and last name
         val newUser = hashMapOf(
@@ -171,5 +194,11 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "GoogleActivity"
         private const val RC_SIGN_IN = 9001
+    }
+
+    private fun goToMapsActivity() {
+        val intent = Intent(this, MapsActivity::class.java)
+        startActivity(intent)
+        finish() // Finish MainActivity to prevent going back to it when pressing back button from MapsActivity
     }
 }

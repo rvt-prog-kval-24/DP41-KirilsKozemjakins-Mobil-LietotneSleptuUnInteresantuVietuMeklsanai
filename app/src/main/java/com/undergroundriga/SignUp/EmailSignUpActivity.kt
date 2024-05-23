@@ -8,12 +8,12 @@ import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.Timestamp
-
-import android.util.Log
+import java.util.*
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
-import java.util.*
+import android.util.Log
+
+import android.content.Intent
 
 class EmailSignUpActivity : AppCompatActivity() {
 
@@ -36,7 +36,7 @@ class EmailSignUpActivity : AppCompatActivity() {
         val passwordRep = findViewById<EditText>(R.id.repeatPassword).text.toString()
         val username = findViewById<EditText>(R.id.username).text.toString()
 
-        if (email.isEmpty() || password.isEmpty() || passwordRep.isEmpty()  || username.isEmpty() || passwordRep != password) {
+        if (email.isEmpty() || password.isEmpty() || passwordRep.isEmpty() || username.isEmpty() || passwordRep != password) {
             Toast.makeText(this, "Please fill all the fields", Toast.LENGTH_SHORT).show()
             return
         }
@@ -44,47 +44,37 @@ class EmailSignUpActivity : AppCompatActivity() {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Sign up success, update UI with the signed-up user's information
                     val user = auth.currentUser
                     Toast.makeText(this, "Email sign up successful", Toast.LENGTH_SHORT).show()
 
-                    // Add user data to Firestore
                     addUserToFirestore(user, email, username, password)
-
-                    // Send verification email
                     sendVerificationEmail(user)
                 } else {
-                    // If sign up fails, display a message to the user.
                     Toast.makeText(this, "Email sign up failed", Toast.LENGTH_SHORT).show()
                 }
             }
     }
 
     private fun addUserToFirestore(user: FirebaseUser?, email: String, username: String, password: String) {
-        // Access a Cloud Firestore instance
         val db = FirebaseFirestore.getInstance()
+        val dateOfCreation = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
 
-        // Get the current timestamp
-        val timestamp = Timestamp.now()
-
-        // Hash the password
         val hashedPassword = hashPassword(password)
 
-        // Create a new user with email, hashed password, username, and dateOfFirstLogin
         val newUser = hashMapOf(
             "email" to email,
             "password" to hashedPassword,
             "username" to username,
-            "dateOfFirstLogin" to timestamp
-            // Add more user data as needed
+            "dateOfFirstLogin" to dateOfCreation
         )
 
-        // Add a new document with a generated ID
         db.collection("Users")
             .document(user!!.uid)
             .set(newUser)
-            .addOnSuccessListener { documentReference ->
+            .addOnSuccessListener {
                 Toast.makeText(this, "User added to Firestore", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, MapsActivity::class.java)
+                startActivity(intent)
                 finish()
             }
             .addOnFailureListener { e ->

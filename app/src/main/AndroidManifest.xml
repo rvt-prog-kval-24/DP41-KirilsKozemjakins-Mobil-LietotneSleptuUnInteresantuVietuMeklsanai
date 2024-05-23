@@ -27,9 +27,7 @@
         <activity
             android:name=".ActivityCheckMySuggestions"
             android:exported="false" />
-        <activity
-            android:name=".ActivityMapsSuggestionAdd"
-            android:exported="false" />
+
         <activity
             android:name=".MainActivityAdmin"
             android:exported="false" />
@@ -43,13 +41,7 @@
             android:name=".MapsActivityAdmin"
             android:exported="false" />
         <activity
-            android:name=".ActivityMapsSuggestionsAdd"
-            android:exported="false" />
-        <activity
-            android:name=".ActivityMapsSuggestionsAddAdmin"
-            android:exported="false" />
-        <activity
-            android:name=".SignUp.ActivityReg"
+            android:name=".ActivityMapsSuggestionAdd"
             android:exported="false" />
         <activity
             android:name=".MapsActivity"

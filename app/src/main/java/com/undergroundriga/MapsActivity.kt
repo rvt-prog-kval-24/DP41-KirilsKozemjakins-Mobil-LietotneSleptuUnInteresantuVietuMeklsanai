@@ -1,5 +1,6 @@
 package com.undergroundriga
 
+
 import android.os.Bundle
 import android.content.Context
 import android.content.Intent
@@ -33,7 +34,8 @@ import androidx.core.content.ContextCompat
 import android.location.LocationListener
 import android.view.View
 import android.widget.ImageView
-
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
 
@@ -43,18 +45,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
     private lateinit var bHideMenu: Button
     private lateinit var userTV: TextView
     private lateinit var logoutBtn: Button
+    private lateinit var ivFocusOnLocation: ImageView
+    private lateinit var auth: FirebaseAuth
+    private lateinit var currentUser: FirebaseUser
+    private lateinit var sharedPreferences: SharedPreferences
 
     private val ZOOM_LEVEL_INCREMENT = 1f
     private val DEFAULT_ZOOM_LEVEL = 10f
 
-    private lateinit var ivFocusOnLocation: ImageView
 
     private val YOUR_PERMISSION_REQUEST_CODE = 123 // Use any unique integer value
 
 
-    lateinit var sharedPreferences: SharedPreferences
     var PREFS_KEY = "prefs"
     var USER_KEY = "user"
+    var USER_NAME_KEY = "user_name"
     var usr = ""
 
 
@@ -65,41 +70,38 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
+        auth = FirebaseAuth.getInstance()
+
+
         userTV = findViewById(R.id.idTVUserName)
         logoutBtn = findViewById(R.id.idBtnLogOut)
 
-        sharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
+        val username = sharedPreferences.getString(USER_NAME_KEY, null)
 
-        usr = sharedPreferences.getString(USER_KEY, null)!!
-
-        userTV.setText("Welcome, $usr !")
+        // Set the username to TextView
+        userTV.text = "Welcome, $username!"
 
 
         ////
 
         logoutBtn.setOnClickListener {
+            // Sign out from Firebase Authentication
+            auth.signOut()
 
-            // on below line we are creating a variable for
-            // editor of shared preferences and initializing it.
+            // Clear SharedPreferences data
             val editor: SharedPreferences.Editor = sharedPreferences.edit()
-
-            // on below line we are clearing our editor.
             editor.clear()
-
-            // on below line we are applying changes which are cleared.
             editor.apply()
 
-            // on below line we are opening our mainactivity by calling intent
-            val i = Intent(this@MapsActivity, MainActivity::class.java)
+            // Start MainActivity
+            val intent = Intent(this@MapsActivity, MainActivity::class.java)
+            startActivity(intent)
 
-            // on below line we are simply starting
-            // our activity to start main activity
-            startActivity(i)
-
-            // on below line we are calling
-            // finish to close our main activity.
+            // Finish the current activity
             finish()
         }
+
 
 
         initializeViews()

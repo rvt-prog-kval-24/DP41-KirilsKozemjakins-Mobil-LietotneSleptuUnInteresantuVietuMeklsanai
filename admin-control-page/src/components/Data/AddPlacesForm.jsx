@@ -37,7 +37,7 @@ const AddPlaceForm = ({ fields }) => {
 
     const convertAddressToLatLng = async () => {
         try {
-            const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=AIzaSyAGyDcdBFmDvmBvOoJQ7mRn1vPr9U7iSlo`);
+            const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=AIzaSyBtQ-lmc3Z6wOE6e-TMYFk-f-6crzCkgtA`);
             const data = await response.json();
             const location = data.results[0].geometry.location;
             setLatLng(new window.google.maps.LatLng(location.lat, location.lng));

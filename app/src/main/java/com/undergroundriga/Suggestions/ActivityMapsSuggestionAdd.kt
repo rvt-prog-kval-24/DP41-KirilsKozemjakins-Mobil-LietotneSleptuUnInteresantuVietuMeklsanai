@@ -1,25 +1,17 @@
 package com.undergroundriga
 
 import android.content.Intent
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
-import android.content.SharedPreferences
-import android.location.Address
-import android.location.Geocoder
-import android.location.Location
 import android.os.Bundle
 import android.view.View
-import android.os.Looper
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.google.android.gms.location.*
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -27,8 +19,15 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FieldValue
+import com.undergroundriga.ActivityCheckMySuggestions
+import com.undergroundriga.MapsActivity
 import java.io.IOException
-import com.google.android.gms.maps.model.Marker
+import java.util.*
+
+import com.undergroundriga.R
+import android.location.Geocoder
 
 
 class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
@@ -42,19 +41,12 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mapFragment: SupportMapFragment
     private lateinit var googleMap: GoogleMap
 
-    // Declare these variables in your activity or fragment
-    private val ZOOM_LEVEL_INCREMENT = 1f
-    private val DEFAULT_ZOOM_LEVEL = 10f  // Set to your preferred default
-
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var firestore: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps_suggestion_add)
-
-        val context = this
-        var db = DataBaseHandler(context)
 
         // Initialize views
         btn_insert = findViewById(R.id.btn_insert)
@@ -63,6 +55,7 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
         spTag = findViewById(R.id.spTag)
         etPlaceAddress = findViewById(R.id.etPlaceAddress)
 
+        // Initialize map
         mapFragment =
             supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -70,8 +63,8 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
         // Initialize fused location client
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // Initialize SharedPreferences
-        sharedPreferences = getSharedPreferences("prefs", MODE_PRIVATE)
+        // Initialize Firestore
+        firestore = FirebaseFirestore.getInstance()
 
         // Set up spinner
         val spinner: Spinner = findViewById(R.id.spTag)
@@ -98,9 +91,6 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
             val address = etPlaceAddress.text.toString()
             val tag = spTag.selectedItem.toString()
 
-            // Get user ID from SharedPreferences
-            val userId = sharedPreferences.getInt("user_id", -1)
-
             // Convert address to LatLng
             val addressLat = convertAddressToLat(address)
             val addressLng = convertAddressToLng(address)
@@ -109,13 +99,31 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
                 val posX = addressLat.toString()
                 val posY = addressLng.toString()
 
-                val suggestPlace = SuggestPlace(placeName, description, userId, tag, posX, posY)
+                // Get user ID from SharedPreferences
+                val userId = getSharedPreferences("prefs", MODE_PRIVATE).getInt("user_id", -1)
 
-                db.insertDataPlacesSuggestions(suggestPlace)
+                // Create a map to hold the suggestion data
+                val suggestData = hashMapOf(
+                    "placeName" to placeName,
+                    "description" to description,
+                    "userId" to userId,
+                    "tag" to tag,
+                    "posX" to posX,
+                    "posY" to posY,
+                    "timestamp" to FieldValue.serverTimestamp() // Add a timestamp for sorting
+                )
 
-                Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+                // Add the suggestion data to Firestore
+                firestore.collection("suggestions")
+                    .add(suggestData)
+                    .addOnSuccessListener { documentReference ->
+                        Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Failed to add suggestion: $e", Toast.LENGTH_SHORT).show()
+                    }
             } else {
-                Toast.makeText(context, "Please Fill All Data's", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please Fill All Data's", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -123,9 +131,7 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
     private fun convertAddressToLat(address: String): Double? {
         val geocoder = Geocoder(this)
         try {
-            val addresses: List
-
-            <Address>? = geocoder.getFromLocationName(address, 1)
+            val addresses = geocoder.getFromLocationName(address, 1)
             if (addresses != null && addresses.isNotEmpty()) {
                 return addresses[0].latitude
             }
@@ -138,7 +144,7 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
     private fun convertAddressToLng(address: String): Double? {
         val geocoder = Geocoder(this)
         try {
-            val addresses: List<Address>? = geocoder.getFromLocationName(address, 1)
+            val addresses = geocoder.getFromLocationName(address, 1)
             if (addresses != null && addresses.isNotEmpty()) {
                 return addresses[0].longitude
             }
@@ -148,32 +154,11 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
         return null
     }
 
-    override fun onMapReady(gMap: GoogleMap) {
-        googleMap = gMap
-
-        val db = DataBaseHandler(this)
-        val data = db.readDataMapsPlaces()
-
-        data.forEach { places ->
-            val mapPoint = LatLng(places.PosX.toDouble(), places.PosY.toDouble())
-
-            val tag = places.Tag
-            val iconResource = CheckTagIc(tag)
-
-            googleMap.addMarker(
-                MarkerOptions()
-                    .position(mapPoint)
-                    .title(places.PlaceName)
-                    .snippet("${places.Description}_${places.Tag}")
-                    .icon(BitmapDescriptorFactory.fromResource(iconResource))
-            )
-        }
+    override fun onMapReady(googleMap: GoogleMap) {
+        this.googleMap = googleMap
 
         // Zoom to Latvia (for example, Riga)
-        val latviaLatLng = LatLng(
-            56.9496,
-            24.1052
-        ) // Replace with the actual coordinates of Latvia or a specific location in Latvia
+        val latviaLatLng = LatLng(56.9496, 24.1052)
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latviaLatLng, 10f))
 
         googleMap.setOnMapClickListener { latLng ->
@@ -195,13 +180,10 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
 
     private fun getAddressFromLatLng(latLng: LatLng): String {
         val geocoder = Geocoder(this)
-        val addresses: List<Address>?
-        val address: String
         try {
-            addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+            val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
             if (addresses != null && addresses.isNotEmpty()) {
-                address = addresses[0].getAddressLine(0)
-                return address
+                return addresses[0].getAddressLine(0)
             }
         } catch (e: IOException) {
             e.printStackTrace()
@@ -220,12 +202,4 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
         startActivity(intent)
         finish()
     }
-
-
-
 }
-
-
-
-
-
