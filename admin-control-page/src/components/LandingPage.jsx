@@ -2,11 +2,11 @@
 
 import React from 'react';
 import { useState } from 'react';
-import { message } from 'antd';
-import { auth, db } from './DataBase/firebase'; // Import auth and db
-import { signInWithEmailAndPassword } from 'firebase/auth'; // Import signInWithEmailAndPassword
 import LoginForm from './auth/LoginForm';
-import { collection, query, where, getDocs } from 'firebase/firestore'; // Import Firestore functions
+import { message } from 'antd';
+import { auth,db } from './DataBase/firebase'; // Import auth
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; // Import Firestore functions
 
 const LandingPage = ({ setIsLoggedIn }) => {
   const [loading, setLoading] = useState(false);
@@ -14,20 +14,20 @@ const LandingPage = ({ setIsLoggedIn }) => {
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      // Check if the user's email exists in the "Admins" collection
-      const adminsRef = collection(db, 'Admins');
-      const adminQuery = query(adminsRef, where('email', '==', values.email));
-      const adminSnapshot = await getDocs(adminQuery);
-      if (!adminSnapshot.empty) {
-        // If the user's email exists in the "Admins" collection, proceed with sign-in
-        const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
-        console.log('Success:', userCredential.user);
-        message.success('Logged in successfully');
-        setIsLoggedIn(true); // Set isLoggedIn to true
-      } else {
-        // If the user's email does not exist in the "Admins" collection, show an error message
-        message.error('You are not authorized to log in.');
-      }
+      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
+
+      const userDoc = {
+        uid: userCredential.user.uid, // Store user ID
+        email: userCredential.user.email, 
+        sessionStart: serverTimestamp(),
+      };
+
+      const sessionsCollectionRef = collection(db, 'UserSessions');
+      await addDoc(sessionsCollectionRef, userDoc);
+
+
+      message.success('Logged in successfully');
+      setIsLoggedIn(true);
     } catch (error) {
       console.error('Failed:', error.message);
       message.error(error.message);

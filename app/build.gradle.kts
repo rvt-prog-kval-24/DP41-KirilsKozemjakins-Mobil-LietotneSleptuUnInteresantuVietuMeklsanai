@@ -59,13 +59,25 @@ dependencies {
     //implementation("com.google.firebase:firebase-core:23.0.0")
     //implementation("com.firebaseui:firebase-ui-auth:7.2.0")
 
-    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
+    implementation("com.google.android.material:material:1.3.0")  // Update to the latest version
+    implementation("com.github.bumptech.glide:glide:4.13.2")
+
+    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
+
+    implementation("androidx.appcompat:appcompat:+")
+
+    // Add the dependency for the Cloud Storage library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-storage")
+
+
     implementation("com.google.firebase:firebase-database")
 
     implementation("com.google.firebase:firebase-analytics")
 
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
+
 
 
     implementation("com.google.android.gms:play-services-auth:21.1.0")

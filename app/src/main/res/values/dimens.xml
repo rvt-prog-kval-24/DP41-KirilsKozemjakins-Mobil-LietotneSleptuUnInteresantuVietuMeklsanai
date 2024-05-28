@@ -6,5 +6,7 @@
     <dimen name="menu_width_hide">0dp</dimen>
     <dimen name="button_menu_width_hide">160dp</dimen>
     <dimen name="hide_button_menu_width_hide">0dp</dimen>
+    <dimen name="default_image_height">200dp</dimen>
+
 
 </resources>

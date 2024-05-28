@@ -74,7 +74,6 @@
         android:background="@drawable/bg_logbar"
         android:fontFamily="@font/font_family_nunito"
         android:hint="Email"
-        android:onClick="goToSignIn"
         android:textColorHint="@color/black_opacity"
         android:textSize="18sp"
         android:textColor="@color/black"
@@ -111,6 +110,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etPassword" />
+
+    <TextView
+        android:id="@+id/tvForgotPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Forgot Password?"
+        android:textColor="#FFFF"
+        android:textSize="16sp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bSubmitLogin" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

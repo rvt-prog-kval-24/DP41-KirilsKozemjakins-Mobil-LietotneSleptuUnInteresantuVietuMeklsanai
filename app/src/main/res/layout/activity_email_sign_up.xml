@@ -13,6 +13,14 @@
         android:scaleType="fitEnd"
         android:src="@drawable/bg_riga_contur_vector" />
 
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitStart"
+        android:src="@drawable/bg_lampa" />
+
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="340dp"
@@ -32,7 +40,7 @@
         android:id="@+id/username"
         android:layout_width="245dp"
         android:layout_height="53dp"
-        android:layout_marginTop="200dp"
+        android:layout_marginTop="220dp"
         android:background="@drawable/bg_logbar"
         android:fontFamily="@font/font_family_nunito"
         android:hint="Username"

@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
                 BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                     .setSupported(true)
                     // Your server's client ID, not your Android client ID.
-                    .setServerClientId("716429145792-ame2svf431sge7du4nqa3pb612gs67qb.apps.googleusercontent.com")
+                    .setServerClientId("716429145792-nt4qem3pck8hobjijbmcic1tin6qikr1.apps.googleusercontent.com")
                     // Only show accounts previously used to sign in.
                     .setFilterByAuthorizedAccounts(true)
                     .build())
@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
 
         // Configure Google Sign In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("1086149395268-oji3l6dtoguqc6tj0d232j8firkg8sfg.apps.googleusercontent.com")
+            .requestIdToken("1086149395268-vs2atf4tg5vaafi17ftk079stsnj5k2u.apps.googleusercontent.com")
             .requestEmail()
             .build()
 
@@ -131,6 +131,10 @@ class MainActivity : AppCompatActivity() {
                     editor.putString(USER_ID_KEY, user?.uid)
                     editor.putString(USER_NAME_KEY, user?.displayName)
                     editor.apply()
+
+                    val intent = Intent(this, MapsActivity::class.java)
+                    startActivity(intent)
+                    finish()
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithCredential:failure", task.exception)
@@ -160,15 +164,43 @@ class MainActivity : AppCompatActivity() {
             // Add more user data as needed
         )
 
-        // Add a new document with a generated ID
+        // Add UserStats data
+        val userStats = hashMapOf(
+            "UserID" to user!!.uid,
+            "VisitedPlaces" to 0,
+            "SubmitedPlaces" to 0,
+            "AcceptedSubm" to 0,
+            "ProfPickPurchased" to 0,
+            "LeaderboardMaxPos" to ""
+        )
+
+        // Add UserBalance data with initial balance of 100
+        val userBalance = hashMapOf(
+            "UserID" to user!!.uid,
+            "Balance" to 100
+        )
+
         db.collection("Users")
             .document(user!!.uid)
             .set(newUser)
-            .addOnSuccessListener { documentReference ->
-                Log.d(TAG, "DocumentSnapshot added")
+            .addOnSuccessListener {
+                db.collection("UserStats")
+                    .document(user!!.uid)
+                    .set(userStats)
+                    .addOnSuccessListener {
+                        db.collection("UserBalance")
+                            .document(user!!.uid)
+                            .set(userBalance)
+                            .addOnSuccessListener {
+                                Toast.makeText(this, "User added to Firestore", Toast.LENGTH_SHORT).show()
+                                val intent = Intent(this, ActivityLogin::class.java)
+                                startActivity(intent)
+                                finish()
+                            }
+                    }
             }
             .addOnFailureListener { e ->
-                Log.w(TAG, "Error adding document", e)
+                Toast.makeText(this, "Error adding user to Firestore", Toast.LENGTH_SHORT).show()
             }
     }
 

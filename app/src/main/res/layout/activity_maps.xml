@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/rootLayout"
     tools:context=".MapsActivity">
 
-    <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
+    <fragment
         class="com.google.android.gms.maps.SupportMapFragment"
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        map:mapId="@string/map_id"/>
+        android:name="com.google.android.gms.maps.SupportMapFragment" />
 
     <ImageView
         android:id="@+id/ivFocusOnLocation"
@@ -24,8 +21,7 @@
         android:backgroundTint="#16355A"
         android:layout_gravity="bottom|left"
         android:src="@drawable/ic_current_location_button"
-        android:layout_margin="16dp"
-/>
+        android:layout_margin="16dp"/>
 
     <ImageView
         android:id="@+id/zoomOutButton"
@@ -35,32 +31,26 @@
         android:layout_gravity="bottom|left"
         android:layout_marginBottom="40dp"
         android:src="@drawable/minus_3108"
-        android:layout_marginLeft="15dp"
-
-        />
-
+        android:layout_marginLeft="15dp"/>
 
     <ImageView
         android:id="@+id/ivMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="menu"
         android:src="@drawable/ic_hamburger_black"
-        android:textColor="@color/white"
         android:backgroundTint="#16355A"
         android:layout_gravity="bottom|right"
         android:layout_marginBottom="80dp"
-        android:layout_marginRight="20dp"
-        />
+        android:layout_marginRight="20dp"/>
 
     <Button
         android:id="@+id/bHideMenu"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:background="@android:color/transparent"
-        android:text="" />
+        android:text=""/>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/vMenu"
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -73,48 +63,228 @@
             android:id="@+id/idTVUserName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="20dp"
+            android:fontFamily="@font/font_family_nunito"
             android:gravity="center"
             android:padding="4dp"
             android:text="User Name"
             android:textAlignment="center"
             android:textAllCaps="false"
-            android:textSize="20sp"
             android:textColor="#FFFFFF"
-            android:fontFamily="@font/font_family_nunito" />
+            android:textSize="20sp"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteX="-30dp" />
+
+        <Button
+            android:id="@+id/Leaderboard"
+            android:layout_width="191dp"
+            android:layout_height="45dp"
+            android:layout_gravity="bottom"
+            android:layout_marginTop="10dp"
+
+            android:backgroundTint="#E1F1F3"
+            android:onClick="goToLeaderboard"
+            android:text="Leaderboard"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/myAchievements" />
 
         <Button
             android:id="@+id/mySuggestPlace"
             android:layout_width="191dp"
             android:layout_height="45dp"
             android:layout_gravity="bottom"
-            android:layout_marginStart="30dp"
-            android:layout_marginTop="331dp"
-            android:text="Suggest Place"
-            android:onClick="goToSuggest"
+            android:layout_marginTop="10dp"
+
             android:backgroundTint="#E1F1F3"
-            android:textColor="@color/black"/>
+            android:onClick="goToSuggest"
+            android:text="Suggest Place"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Leaderboard" />
+
+        <Button
+            android:id="@+id/myAchievements"
+            android:layout_width="191dp"
+            android:layout_height="45dp"
+            android:layout_gravity="bottom"
+            android:layout_marginTop="10dp"
+
+            android:backgroundTint="#E1F1F3"
+            android:onClick="goToAchievements"
+            android:text="Achievements"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/myProf" />
+
+        <Button
+            android:id="@+id/myProf"
+            android:layout_width="191dp"
+            android:layout_height="45dp"
+            android:layout_gravity="bottom"
+
+            android:backgroundTint="#E1F1F3"
+            android:onClick="goToProf"
+            android:text="My Profile"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toTopOf="@+id/idBtnLogOut"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/idTVUserName" />
 
         <Button
             android:id="@+id/idBtnLogOut"
             android:layout_width="124dp"
             android:layout_height="53dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginEnd="20dp"
+            android:layout_gravity="center"
+            android:backgroundTint="#A7D1D2"
+            android:layout_marginBottom="130dp"
             android:padding="5dp"
             android:text="Logout"
-            android:textSize="18sp"
-            android:layout_gravity="center"
+            android:textAllCaps="false"
             android:textColor="@color/black"
-            android:backgroundTint="#A7D1D2"
-            android:textAllCaps="false" />
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <LinearLayout
+        android:id="@+id/tagFilterLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp"
+        android:layout_gravity="top|left"
+        android:background="#AAFFFFFF"
+        android:visibility="gone"
+        android:elevation="8dp">
 
+        <CheckBox
+            android:id="@+id/tagTeashops"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="#Teashops"/>
 
+        <CheckBox
+            android:id="@+id/tagAnimeshops"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="#Animeshops"/>
 
+        <CheckBox
+            android:id="@+id/tagFood"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="#Food"/>
+
+        <CheckBox
+            android:id="@+id/tagGraffiti"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="#Graffiti"/>
+
+        <CheckBox
+            android:id="@+id/tagExotic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="#Exotic"/>
+
+        <CheckBox
+            android:id="@+id/tagSecondHand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="#Second hand"/>
+
+        <CheckBox
+            android:id="@+id/tagToilet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="#Toilet"/>
+
+        <CheckBox
+            android:id="@+id/tagVinylStore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="#Vinyl store"/>
+
+        <CheckBox
+            android:id="@+id/tagMonument"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="#Monument"/>
+
+        <Button
+            android:id="@+id/applyTagFilterButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Apply Filter"/>
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/ivTagFilter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_place"
+        android:backgroundTint="#16355A"
+        android:layout_gravity="top|left"
+        android:layout_margin="16dp"/>
+
+    <!-- CoordinatorLayout wrapping Bottom Sheet -->
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Bottom Sheet Layout -->
+        <LinearLayout
+            android:id="@+id/bottomSheet"
+            android:layout_width="match_parent"
+            android:layout_height="600dp"
+            android:layout_gravity="bottom"
+            android:orientation="vertical"
+            android:background="#16355A"
+            app:behavior_hideable="true"
+            app:behavior_peekHeight="0dp"
+            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+
+            <TextView
+                android:id="@+id/placeName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:padding="16dp"
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/font_family_nunito"
+                android:text="Place Name"/>
+
+            <TextView
+                android:id="@+id/placeDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/font_family_nunito"
+                android:text="Place Description"/>
+
+            <TextView
+                android:id="@+id/placeAuthor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/font_family_nunito"
+                android:text="Place Author"/>
+
+            <ImageView
+                android:id="@+id/placeImage"
+                android:layout_width="match_parent"
+                android:layout_height="500dp"
+                android:scaleType="fitCenter"/>
+        </LinearLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </FrameLayout>

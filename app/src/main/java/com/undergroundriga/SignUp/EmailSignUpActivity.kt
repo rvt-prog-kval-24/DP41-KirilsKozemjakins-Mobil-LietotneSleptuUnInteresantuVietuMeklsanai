@@ -63,19 +63,43 @@ class EmailSignUpActivity : AppCompatActivity() {
 
         val newUser = hashMapOf(
             "email" to email,
-            "password" to hashedPassword,
-            "username" to username,
+            "name" to username,
             "dateOfFirstLogin" to dateOfCreation
+        )
+
+        // Add UserStats data
+        val userStats = hashMapOf(
+            "UserID" to user!!.uid,
+            "VisitedPlaces" to 0,
+            "SubmitedPlaces" to 0,
+            "AcceptedSubm" to 0,
+            "ProfPickPurchased" to 0,
+            "LeaderboardMaxPos" to ""
+        )
+
+        // Add UserBalance data with initial balance of 100
+        val userBalance = hashMapOf(
+            "UserID" to user!!.uid,
+            "Balance" to 100
         )
 
         db.collection("Users")
             .document(user!!.uid)
             .set(newUser)
             .addOnSuccessListener {
-                Toast.makeText(this, "User added to Firestore", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, MapsActivity::class.java)
-                startActivity(intent)
-                finish()
+                db.collection("UserStats")
+                    .document(user!!.uid)
+                    .set(userStats)
+                    .addOnSuccessListener {
+                        db.collection("UserBalance")
+                            .document(user!!.uid)
+                            .set(userBalance)
+                            .addOnSuccessListener {
+                                val intent = Intent(this, ActivityLogin::class.java)
+                                startActivity(intent)
+                                finish()
+                            }
+                    }
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Error adding user to Firestore", Toast.LENGTH_SHORT).show()

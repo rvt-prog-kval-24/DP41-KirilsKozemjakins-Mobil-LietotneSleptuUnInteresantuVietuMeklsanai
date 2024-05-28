@@ -22,12 +22,20 @@
         android:theme="@style/Theme.UndergroundRiga"
         tools:targetApi="31">
         <activity
+            android:name=".UsersData.UserProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LeaderBoardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AchievementsActivity"
+            android:exported="false" />
+        <activity
             android:name=".EmailSignUpActivity"
             android:exported="false" />
         <activity
             android:name=".ActivityCheckMySuggestions"
             android:exported="false" />
-
         <activity
             android:name=".MainActivityAdmin"
             android:exported="false" />
