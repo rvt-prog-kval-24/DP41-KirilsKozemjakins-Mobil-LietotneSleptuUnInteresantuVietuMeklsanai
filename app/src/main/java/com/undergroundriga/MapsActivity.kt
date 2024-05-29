@@ -41,7 +41,6 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
-import com.undergroundriga.UsersData.LeaderBoardActivity
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
@@ -618,7 +617,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
     }
 
     fun goToProf(view: View) {
-        val intent = Intent(this, ActivityMapsSuggestionAdd::class.java)
+        val intent = Intent(this, UserProfileActivity::class.java)
         startActivity(intent)
     }
 }

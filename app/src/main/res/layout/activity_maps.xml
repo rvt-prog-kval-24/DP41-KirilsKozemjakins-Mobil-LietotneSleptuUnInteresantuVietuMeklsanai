@@ -54,8 +54,8 @@
         android:id="@+id/vMenu"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:background="@drawable/bg_menu_bg_lampa"
         android:layout_gravity="right"
+        android:background="@drawable/bg_menu_bg_lampa"
         android:orientation="vertical">
 
 
@@ -79,68 +79,70 @@
             android:layout_width="191dp"
             android:layout_height="45dp"
             android:layout_gravity="bottom"
-            android:layout_marginTop="10dp"
+            android:layout_marginBottom="15dp"
+
 
             android:backgroundTint="#E1F1F3"
             android:onClick="goToLeaderboard"
             android:text="Leaderboard"
             android:textColor="@color/black"
+            app:layout_constraintBottom_toTopOf="@+id/mySuggestPlace"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/myAchievements" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/mySuggestPlace"
             android:layout_width="191dp"
             android:layout_height="45dp"
             android:layout_gravity="bottom"
-            android:layout_marginTop="10dp"
+            android:layout_marginBottom="70dp"
 
             android:backgroundTint="#E1F1F3"
             android:onClick="goToSuggest"
             android:text="Suggest Place"
             android:textColor="@color/black"
+            app:layout_constraintBottom_toTopOf="@+id/idBtnLogOut"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/Leaderboard" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/myAchievements"
             android:layout_width="191dp"
             android:layout_height="45dp"
             android:layout_gravity="bottom"
-            android:layout_marginTop="10dp"
+            android:layout_marginBottom="15dp"
+
 
             android:backgroundTint="#E1F1F3"
             android:onClick="goToAchievements"
             android:text="Achievements"
             android:textColor="@color/black"
+            app:layout_constraintBottom_toTopOf="@+id/Leaderboard"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/myProf" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/myProf"
             android:layout_width="191dp"
             android:layout_height="45dp"
             android:layout_gravity="bottom"
+            android:layout_marginBottom="15dp"
 
             android:backgroundTint="#E1F1F3"
             android:onClick="goToProf"
             android:text="My Profile"
             android:textColor="@color/black"
-            app:layout_constraintBottom_toTopOf="@+id/idBtnLogOut"
+            app:layout_constraintBottom_toTopOf="@+id/myAchievements"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/idTVUserName" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/idBtnLogOut"
             android:layout_width="124dp"
             android:layout_height="53dp"
             android:layout_gravity="center"
-            android:backgroundTint="#A7D1D2"
             android:layout_marginBottom="130dp"
+            android:backgroundTint="#A7D1D2"
             android:padding="5dp"
             android:text="Logout"
             android:textAllCaps="false"

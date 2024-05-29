@@ -10,9 +10,12 @@ import { collection, query, where, getDocs, updateDoc, serverTimestamp } from 'f
 import { auth, db } from './components/DataBase/firebase'; // Import auth and db
 import LandingPage from './components/LandingPage.jsx';
 import MainPage from './components/MainPage.jsx';
+
 import PlacesDataPage from './components/WorkWithData/PlacesDataPage.jsx';
 import SuggestionsDataPage from './components/WorkWithData/SuggestionsDataPage.jsx';
 import AchievementsDataPage from './components/WorkWithData/AchievementsDataPage.jsx'
+import ProfilePickDataPage from './components/WorkWithData/ProfilePickDataPage.jsx';
+
 import UsersDataPage from './components/WorkWithData/UsersDataPage.jsx';
 import AdminsDataPage from './components/WorkWithData/AdminDataPage.jsx';
 
@@ -32,8 +35,9 @@ function Navbar({ isLoggedIn }) {
           <Menu.Item key="3"><Link to="/places_data">Places</Link></Menu.Item>
           <Menu.Item key="4"><Link to="/suggestions_data">Suggestions</Link></Menu.Item>
           <Menu.Item key="5"><Link to="/achievements_data">Achievements</Link></Menu.Item>
-          <Menu.Item key="6"><Link to="/users_data">Users</Link></Menu.Item>
-          <Menu.Item key="7"><Link to="/admin_data">Admins</Link></Menu.Item>
+          <Menu.Item key="6"><Link to="/prof_pick_data">Profile Pictures</Link></Menu.Item>
+          <Menu.Item key="7"><Link to="/users_data">Users</Link></Menu.Item>
+          <Menu.Item key="8"><Link to="/admin_data">Admins</Link></Menu.Item>
         </>
       )}
     </Menu>
@@ -115,8 +119,12 @@ function App() {
             <Route path="/places_data" element={isLoggedIn ? <PlacesDataPage /> : <Navigate to="/" replace />}/>
             <Route path="/suggestions_data" element={isLoggedIn ? <SuggestionsDataPage />: <Navigate to="/" replace />}/>
             <Route path="/achievements_data" element={isLoggedIn ? <AchievementsDataPage />: <Navigate to="/" replace />}/>
+            <Route path="/prof_pick_data" element={isLoggedIn ? <ProfilePickDataPage />: <Navigate to="/" replace />}/>
             <Route path="/users_data" element={isLoggedIn ? <UsersDataPage />: <Navigate to="/" replace />}/>
             <Route path="/admin_data" element={isLoggedIn ? <AdminsDataPage />: <Navigate to="/" replace />}/>
+
+
+            
           </Routes>
         </Content>
         <Footer style={{ textAlign: 'center' }}>UndergroundRiga ©{new Date().getFullYear()} Created by KirilsK</Footer>

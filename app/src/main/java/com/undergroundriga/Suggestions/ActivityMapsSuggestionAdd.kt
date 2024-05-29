@@ -10,6 +10,7 @@ import android.location.Geocoder
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -261,11 +262,15 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun goBackToMaps() {
+    fun goBackToMaps(view: View) {
         val intent = Intent(this, MapsActivity::class.java)
         startActivity(intent)
         finish() // Finish MainActivity to prevent going back to it when pressing back button from MapsActivity
     }
+
+
 }
+
+
 
 

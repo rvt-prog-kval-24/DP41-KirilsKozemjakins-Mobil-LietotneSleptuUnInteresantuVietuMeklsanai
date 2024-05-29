@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#16355A"
     android:orientation="vertical"
-    tools:context=".MapsActivityAdmin">
+    tools:context=".ActivityMapsSuggestionAdd">
 
     <TextView
         android:id="@+id/textView"
@@ -36,8 +36,9 @@
         android:layout_height="645dp"
         android:layout_marginTop="25dp"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        tools:layout_editor_absoluteX="-2dp">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView">
 
         <ImageView
             android:id="@+id/imageView_upload_photo"
@@ -158,7 +159,7 @@
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="goToMapsActivity"
+        android:onClick="goBackToMaps"
         android:text="X"
         android:src="@drawable/b_ic_exit"
         android:textSize="18sp"

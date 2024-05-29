@@ -94,9 +94,14 @@ const AchievementForm = () => {
       key: 'Description',
     },
     {
-      title: 'Condition',
-      dataIndex: 'Condition',
-      key: 'Condition',
+      title: 'Required Value',
+      dataIndex: 'RequiredValue',
+      key: 'RequiredValue',
+    },
+    {
+      title: 'Condition Variable',
+      dataIndex: 'ConditionVariable',
+      key: 'ConditionVariable',
     },
     {
       title: 'Reward',
@@ -143,8 +148,11 @@ const AchievementForm = () => {
         <Form.Item label="Description">
           <Input name="Description" placeholder="Enter Achievement Description" value={formData.Description || ''} onChange={handleChange} />
         </Form.Item>
-        <Form.Item label="Condition">
-          <Input name="Condition" placeholder="Enter Achievement Condition" value={formData.Condition || ''} onChange={handleChange} />
+        <Form.Item label="Condition Variable">
+          <Input name="ConditionVariable" placeholder="Enter Condition Variable" value={formData.ConditionVariable || ''} onChange={handleChange} />
+        </Form.Item>
+        <Form.Item label="Required Value">
+          <Input name="RequiredValue" placeholder="Enter Required Value" value={formData.RequiredValue || ''} onChange={handleChange} />
         </Form.Item>
         <Form.Item label="Reward">
           <Input type="number" name="Reward" placeholder="Enter Reward Points" value={formData.Reward || 0} onChange={handleChange} />
