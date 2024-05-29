@@ -1,9 +1,10 @@
 // PlacesSuggestionsPage.jsx
 
 import React, { useEffect, useState } from 'react';
-import { db, storage } from '../DataBase/firebase'; // Assuming you have storage initialized in firebase.js
+import { db } from '../DataBase/firebase'; // Assuming you have db initialized in firebase.js
 import { collection, getDocs, doc, updateDoc, addDoc } from 'firebase/firestore';
 import { Card, Space, Button } from 'antd';
+
 
 const PlacesSuggestionsPage = () => {
   const [suggestions, setSuggestions] = useState([]);
@@ -12,7 +13,9 @@ const PlacesSuggestionsPage = () => {
   useEffect(() => {
     const fetchSuggestions = async () => {
       const querySnapshot = await getDocs(suggestionsCollection);
-      const suggestionsList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const suggestionsList = querySnapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .filter(suggestion => suggestion.respond === 'pending'); // Filter by 'respond' equal to 'pending'
       setSuggestions(suggestionsList);
     };
 
@@ -22,28 +25,27 @@ const PlacesSuggestionsPage = () => {
   const handleConfirm = async (suggestion) => {
     const placesCollection = collection(db, 'Places');
     const suggestionDoc = doc(suggestionsCollection, suggestion.id);
-  
+
     try {
       // Ensure all required fields are available
       const {
         PlaceName = '',
         Description = '',
-        tags = '',
+        Tag = '',
         PosX = '',
         PosY = '',
         SuggestionDate = new Date().toISOString(),
         imageUrl = '', // Updated from photoURL
         UserId = '', // Added UserId field
       } = suggestion;
-  
+
       // Upload image to Firebase Storage if imageUrl is available
 
-  
       // Add suggestion data to the Places table
       await addDoc(placesCollection, {
         PlaceName,
         Description,
-        tags,
+        Tag,
         PosX,
         PosY,
         SuggestionDate,
@@ -51,19 +53,18 @@ const PlacesSuggestionsPage = () => {
         UserId, // Include UserId
         // Add any additional fields you want to save to the Places table
       });
-  
+
       // Update suggestion document in the PlacesSuggestions collection
       await updateDoc(suggestionDoc, {
         respond: 'positive',
       });
-  
+
       // Remove the confirmed suggestion from the suggestions state
       setSuggestions(suggestions.filter(item => item.id !== suggestion.id));
     } catch (error) {
       console.error('Error confirming suggestion:', error);
     }
   };
-  
 
   const handleReject = async (suggestion) => {
     const suggestionDoc = doc(suggestionsCollection, suggestion.id);
@@ -82,13 +83,13 @@ const PlacesSuggestionsPage = () => {
   };
 
   return (
-    <Space direction="vertical" size={16}>
+    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
       {suggestions.map(suggestion => (
         <Card
           key={suggestion.id}
           title={suggestion.PlaceName}
           extra={<span>{new Date(suggestion.SuggestionDate).toLocaleDateString()}</span>}
-          style={{ width: 300 }}
+          style={{ width: 300, margin: '10px', display: 'flex', flexDirection: 'column' }}
         >
           <p>{suggestion.Description}</p>
           <p><b>Tag:</b> {suggestion.Tag}</p>
@@ -97,15 +98,17 @@ const PlacesSuggestionsPage = () => {
             <img src={suggestion.imageUrl} alt="Suggestion" style={{ width: '100%', height: 'auto' }} />
           )}
           <p><b>Suggested by:</b> {suggestion.UserId}</p>
-          <Button type="primary" onClick={() => handleConfirm(suggestion)} style={{ marginRight: 8 }}>
-            Confirm
-          </Button>
-          <Button danger onClick={() => handleReject(suggestion)}>
-            Reject
-          </Button>
+          <div style={{ marginTop: 'auto' }}>
+            <Button type="primary" onClick={() => handleConfirm(suggestion)} style={{ marginRight: 8 }}>
+              Confirm
+            </Button>
+            <Button danger onClick={() => handleReject(suggestion)}>
+              Reject
+            </Button>
+          </div>
         </Card>
       ))}
-    </Space>
+    </div>
   );
 };
 

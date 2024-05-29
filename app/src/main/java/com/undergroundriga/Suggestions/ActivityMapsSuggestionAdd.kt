@@ -150,7 +150,8 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
                     "PosX" to posX.toString(),
                     "PosY" to posY.toString(),
                     "suggestionDate" to FieldValue.serverTimestamp(),
-                    "imageUrl" to uploadedImageUrl  // Add the uploaded image URL
+                    "imageUrl" to uploadedImageUrl,  // Add the uploaded image URL
+                    "respond" to "pending"  // Add the uploaded image URL
                 )
 
                 // Add the suggestion data to Firestore

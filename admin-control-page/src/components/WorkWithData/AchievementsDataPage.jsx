@@ -37,6 +37,8 @@ const AchievementForm = () => {
         const uploadTask = uploadBytesResumable(storageRef, photo);
         await uploadTask;
         photoURL = await getDownloadURL(uploadTask.snapshot.ref);
+      } else if (isEditing && formData.photoURL) { // Check if editing and existing photoURL
+        photoURL = formData.photoURL; // Use existing photoURL from formData
       }
 
       const achievementData = {
