@@ -42,6 +42,9 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
 
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.runBlocking
+
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
 
@@ -539,6 +542,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
                             "MapsActivity",
                             "VisitedPlaces count updated successfully!"
                         )
+                        checkAndUpdateAchievements(userID, updatedVisitedPlaces) // Check for achievements after update
                     }
                     .addOnFailureListener { e ->
                         Log.w(
@@ -552,6 +556,143 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
                 Log.w(
                     "MapsActivity",
                     "Error fetching user stats",
+                    e
+                )
+            }
+    }
+
+    private fun checkAndUpdateAchievements(userID: String, updatedVisitedPlaces: Long) = runBlocking {
+        val achievementsRef = FirebaseFirestore.getInstance().collection("Achievements")
+
+        try {
+            val achievementsSnapshot = achievementsRef.get().await()
+            val completedAchievementIds = getCompletedAchievementIds(userID)
+
+
+            for (achievementDoc in achievementsSnapshot) {
+                val conditionVariable = achievementDoc.getString("ConditionVariable")
+                val requiredValue = achievementDoc.getLong("RequiredValue") ?: 0L
+                val reward = achievementDoc.getLong("Reward") ?: 0L
+                val achievementId = achievementDoc.id
+
+
+                if (conditionVariable == "VisitedPlaces" && updatedVisitedPlaces >= requiredValue &&
+                    !completedAchievementIds.contains(achievementId)) {
+                    // Achievement unlocked! Update user balance and completed achievements
+                    updateUserBalance(userID, reward)
+                    addUserCompletedAchievement(userID, achievementId)
+                    break // Only process the first achievement that meets the condition
+                }
+            }
+        } catch (e: Exception) {
+            Log.w(
+                "MapsActivity",
+                "Error fetching achievements",
+                e
+            )
+        }
+    }
+
+    private suspend fun getCompletedAchievementIds(userID: String): List<String> {
+        val completedAchievementIds = mutableListOf<String>()
+        val completedAchievementsRef = FirebaseFirestore.getInstance()
+            .collection("Users").document(userID).collection("CompletedAchievements")
+
+        try {
+            val documentsSnapshot = completedAchievementsRef.get().await()
+            for (documentSnapshot in documentsSnapshot) {
+                val achievementId = documentSnapshot.getString("AchievementID")
+
+
+                if (achievementId != null) {
+                    completedAchievementIds.add(achievementId)
+
+                }
+            }
+        } catch (e: Exception) {
+            Log.w(
+                "MapsActivity",
+                "Error fetching completed achievements for user $userID",
+                e
+            )
+        }
+
+
+
+        return completedAchievementIds
+    }
+
+    private fun updateUserBalance(userID: String, reward: Long) {
+        val userBalanceRef = db.collection("UserBalance").whereEqualTo("UserID", userID)
+
+        userBalanceRef.get()
+            .addOnSuccessListener { documentsSnapshot ->
+                if (documentsSnapshot.isEmpty) {
+                    // UserBalance document not found, create a new one with initial balance (0)
+                    db.collection("UserBalance").document(userID).set(
+                        hashMapOf("UserID" to userID, "Balance" to 0L)
+                    )
+                        .addOnSuccessListener {
+                            Log.d(
+                                "MapsActivity",
+                                "New UserBalance document created for user: $userID"
+                            )
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w(
+                                "MapsActivity",
+                                "Error creating UserBalance document",
+                                e
+                            )
+                        }
+                    return@addOnSuccessListener // Exit the function if no documents found
+                }
+
+                // Get the first document (assuming there should be only one per user)
+                val documentSnapshot = documentsSnapshot.documents[0]
+                val currentBalance = documentSnapshot.getLong("Balance") ?: 0L
+                val updatedBalance = currentBalance + reward
+
+                documentSnapshot.reference.update("Balance", updatedBalance)
+                    .addOnSuccessListener {
+                        Log.d(
+                            "MapsActivity",
+                            "User balance updated successfully! New balance: $updatedBalance"
+                        )
+                    }
+                    .addOnFailureListener { e ->
+                    Log.w(
+                        "MapsActivity",
+                        "Error updating user balance",
+                        e
+                    )
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.w(
+                    "MapsActivity",
+                    "Error fetching user balance",
+                    e
+                )
+            }
+    }
+
+    private fun addUserCompletedAchievement(userID: String, achievementId: String) {
+        val userRef = db.collection("Users").document(userID)
+
+        val completedAchievements = userRef.collection("CompletedAchievements")
+
+        completedAchievements.add(hashMapOf("AchievementID" to achievementId))
+            .addOnSuccessListener { documentReference ->
+                Log.d(
+                    "MapsActivity",
+                    "Achievement $achievementId added to completed achievements for user $userID"
+                )
+            }
+            .addOnFailureListener { e ->
+                Log.w(
+                    "MapsActivity",
+                    "Error adding achievement to completed list for user $userID",
                     e
                 )
             }

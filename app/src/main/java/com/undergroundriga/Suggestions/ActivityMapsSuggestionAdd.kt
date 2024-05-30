@@ -141,6 +141,8 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
                     return@setOnClickListener
                 }
 
+                val currentDate = Date()
+
                 // Create a map to hold the suggestion data
                 val suggestData = hashMapOf(
                     "PlaceName" to placeName,
@@ -149,7 +151,7 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
                     "Tag" to tag,
                     "PosX" to posX.toString(),
                     "PosY" to posY.toString(),
-                    "suggestionDate" to FieldValue.serverTimestamp(),
+                    "suggestionDate" to currentDate,
                     "imageUrl" to uploadedImageUrl,  // Add the uploaded image URL
                     "respond" to "pending"  // Add the uploaded image URL
                 )

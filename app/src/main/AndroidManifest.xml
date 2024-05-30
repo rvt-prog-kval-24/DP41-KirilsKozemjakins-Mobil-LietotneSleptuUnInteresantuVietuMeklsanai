@@ -20,7 +20,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.UndergroundRiga"
-        tools:targetApi="31">
+        tools:targetApi="31"
+        >
+
+        <meta-data
+            android:name="com.bumptech.glide.module.GlideModule"
+            android:value="com.undergroundriga.GlideSvgModule" />
+
+        <activity
+            android:name=".ProfilePickStoreActivity"
+            android:exported="false" />
         <activity
             android:name=".UserProfileActivity"
             android:exported="false" />

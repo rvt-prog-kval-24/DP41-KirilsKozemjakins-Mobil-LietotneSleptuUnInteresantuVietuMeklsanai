@@ -5,37 +5,167 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#16355A"
-    android:orientation="vertical"
+
     tools:context=".UserProfileActivity">
 
     <ImageView
         android:id="@+id/imageView3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="70dp"
         android:scaleType="fitStart"
-        android:src="@drawable/bg_lampa" />
+
+        android:src="@drawable/ic_lampa_up_side_down" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="190dp"
+        android:layout_marginTop="50dp"
+        android:fontFamily="@font/font_family_nunito"
         android:gravity="center_horizontal"
         android:text="Users Profile"
         android:textColor="#FFFFFF"
-        android:fontFamily="@font/font_family_nunito"
         android:textSize="20sp"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/UserProfPick"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:layout_marginTop="25dp"
+        android:onClick="goToProfPickStore"
+        android:src="@drawable/default_prof_pick"
+
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userName" />
+
+    <TextView
+        android:id="@+id/userEmailTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:text="Email"
+        android:fontFamily="@font/font_family_nunito"
+
+        android:textColor="#FFFFFF"
+        android:paddingLeft="30dp"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/userIdTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/userName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="13dp"
+        android:gravity="center_horizontal"
+        android:fontFamily="@font/font_family_nunito"
+
+        android:text="UserName"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="@+id/imageView3"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <TextView
+        android:id="@+id/userIdTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:paddingLeft="30dp"
+        android:fontFamily="@font/font_family_nunito"
+
+        android:text="User ID"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <TextView
+        android:id="@+id/userBalanceTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:drawableRight="@drawable/ic_money_paw"
+        android:paddingBottom="10dp"
+        android:paddingLeft="100dp"
+        android:paddingRight="80dp"
+        android:paddingTop="8dp"
+        android:text="Balance"
+        android:fontFamily="@font/font_family_nunito"
+        android:background="@drawable/ic_balance_bar"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:layout_marginBottom="50dp"
+        app:layout_constraintBottom_toTopOf="@+id/userStatsButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+
+
+
+    <Button
+        android:id="@+id/userStatsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#7AD180"
+        android:onClick="ShowStats"
+        android:text="Statistic"
+        android:textColor="@color/black"
+        android:fontFamily="@font/font_family_nunito"
+
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/resetPasswordButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/resetPasswordButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="15dp"
+        android:backgroundTint="#A7D1D2"
+        android:onClick="resetPassword"
+        android:text="Reset Password"
+        android:fontFamily="@font/font_family_nunito"
+
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toTopOf="@+id/userEmailTextView"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/DeleteAccountButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="15dp"
+        android:backgroundTint="#AE1515"
+        android:onClick="deleteAccount"
+        android:text="Delete Account"
+        android:fontFamily="@font/font_family_nunito"
+
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/userEmailTextView"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <ImageView
         android:id="@+id/button"
         android:layout_width="30dp"
         android:layout_height="30dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
         android:onClick="goBackToMaps"
         android:src="@drawable/b_ic_exit"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
+
