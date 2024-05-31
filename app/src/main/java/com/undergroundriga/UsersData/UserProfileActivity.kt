@@ -48,7 +48,19 @@ class UserProfileActivity : AppCompatActivity() {
         if (user != null) {
             userEmailTextView.text = "Email: ${user.email}"
             userIdTextView.text = "User ID: ${user.uid}"
-            userNameTextView.text = "User ID: ${username}"
+
+            firestore.collection("Users").document(user.uid)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        val username = document.getString("name").orEmpty()
+
+                        userNameTextView.text = "$username"
+                    } else {
+                        userNameTextView.text  = "Who are you???"
+                    }
+                }
+
 
             fetchUserBalance(user.uid)
         }

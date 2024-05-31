@@ -154,7 +154,7 @@ const AchievementForm = () => {
           <Input name="ConditionVariable" placeholder="Enter Condition Variable" value={formData.ConditionVariable || ''} onChange={handleChange} />
         </Form.Item>
         <Form.Item label="Required Value">
-          <Input name="RequiredValue" placeholder="Enter Required Value" value={formData.RequiredValue || ''} onChange={handleChange} />
+          <Input type="number" placeholder="Enter Required Value" value={formData.RequiredValue || 0} onChange={handleChange} />
         </Form.Item>
         <Form.Item label="Reward">
           <Input type="number" name="Reward" placeholder="Enter Reward Points" value={formData.Reward || 0} onChange={handleChange} />

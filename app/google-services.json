@@ -15,14 +15,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "1086149395268-hoo958dd40lupc33s726sf7aaof661vg.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.underground.riga.app",
-            "certificate_hash": "1ba078b4726bc88d0f64493cba88482504ccae61"
-          }
-        },
-        {
           "client_id": "1086149395268-oji3l6dtoguqc6tj0d232j8firkg8sfg.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -51,14 +43,6 @@
         }
       },
       "oauth_client": [
-        {
-          "client_id": "1086149395268-vs2atf4tg5vaafi17ftk079stsnj5k2u.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.undergroundriga",
-            "certificate_hash": "1ba078b4726bc88d0f64493cba88482504ccae61"
-          }
-        },
         {
           "client_id": "1086149395268-oji3l6dtoguqc6tj0d232j8firkg8sfg.apps.googleusercontent.com",
           "client_type": 3

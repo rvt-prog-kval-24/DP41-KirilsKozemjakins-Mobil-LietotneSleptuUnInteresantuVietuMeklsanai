@@ -10,6 +10,7 @@ import android.location.Geocoder
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.provider.OpenableColumns
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -21,6 +22,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -38,6 +40,7 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var etPlaceName: EditText
     private lateinit var etDescription: EditText
     private lateinit var spTag: Spinner
+    private lateinit var imageViewUploadPhoto: EditText
 
     private var uploadedImageUrl: String = ""
     private val REQUEST_IMAGE_CODE = 100
@@ -69,6 +72,7 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
         etPlaceName = findViewById(R.id.etPlaceName)
         etDescription = findViewById(R.id.etDescription)
         spTag = findViewById(R.id.spTag)
+        imageViewUploadPhoto = findViewById(R.id.imageView_upload_photo)
 
         // Initialize map
         mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
@@ -94,8 +98,8 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
             "#Monument"
         )
 
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val adapter = ArrayAdapter(this, R.layout.spinner_item, items)
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
         spinner.adapter = adapter
 
         btn_insert.setOnClickListener {
@@ -127,8 +131,8 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
                         posX, posY, distance
                     )
 
-                    if (distance[0] > 25) {
-                        Toast.makeText(this, "Place must be within 25 meters of your current location", Toast.LENGTH_SHORT).show()
+                    if (distance[0] > 50) {
+                        Toast.makeText(this, "Place must be within 50 meters of your current location", Toast.LENGTH_SHORT).show()
                         return@setOnClickListener
                     }
                 } else {
@@ -141,7 +145,7 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
                     return@setOnClickListener
                 }
 
-                val currentDate = Date()
+                val currentDate = (Date()).toString()
 
                 // Create a map to hold the suggestion data
                 val suggestData = hashMapOf(
@@ -160,10 +164,22 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
                 firestore.collection("PlacesSuggestions")
                     .add(suggestData)
                     .addOnSuccessListener { documentReference ->
-                        Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show()
-                        val intent = Intent(this, ActivityCheckMySuggestions::class.java)
-                        startActivity(intent)
-                        finish()
+
+                        // Update user stats after successful suggestion submission
+                        val sharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
+                        val userId = sharedPreferences.getString(USER_ID_KEY, null)
+                        if (userId != null) {
+                            HandleAchievements.updateUserStatsField(userId, "SubmitedPlaces", 1)
+
+                            goToMySugg()
+
+                            Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show()
+                        }
+
+
+
+
+
                     }
                     .addOnFailureListener { e ->
                         Toast.makeText(this, "Failed to add suggestion: $e", Toast.LENGTH_SHORT).show()
@@ -173,7 +189,7 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
-        val uploadImageView = findViewById<ImageView>(R.id.imageView_upload_photo)
+        val uploadImageView = findViewById<TextView>(R.id.imageView_upload_photo)
         uploadImageView.setOnClickListener {
             // Show options dialog
             val options = arrayOf("Select from Gallery", "Take a Photo")
@@ -204,12 +220,28 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_IMAGE_CODE && resultCode == RESULT_OK) {
             val imageUri = data?.data ?: return
+            val fileName = getFileName(imageUri)
+            imageViewUploadPhoto.setText(fileName)
             uploadImageToFirebase(imageUri)
         } else if (requestCode == REQUEST_CAMERA_CODE && resultCode == RESULT_OK) {
             val imageBitmap = data?.extras?.get("data") as? Bitmap ?: return
             val imageUri = getImageUriFromBitmap(this, imageBitmap)
+            val fileName = getFileName(imageUri)
+            imageViewUploadPhoto.setText(fileName)
             uploadImageToFirebase(imageUri)
         }
+    }
+
+    private fun getFileName(uri: Uri): String {
+        var fileName = ""
+        val cursor = contentResolver.query(uri, null, null, null, null)
+        cursor?.use {
+            val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (nameIndex != -1 && it.moveToFirst()) {
+                fileName = it.getString(nameIndex)
+            }
+        }
+        return fileName
     }
 
     private fun getImageUriFromBitmap(context: Context, bitmap: Bitmap): Uri {
@@ -261,7 +293,8 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
 
         googleMap.setOnMapClickListener { latLng ->
             currentMarker?.remove()
-            currentMarker = googleMap.addMarker(MarkerOptions().position(latLng))
+            currentMarker = googleMap.addMarker(MarkerOptions().position(latLng).icon(
+                BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_choose_location)))
         }
     }
 
@@ -269,6 +302,18 @@ class ActivityMapsSuggestionAdd : AppCompatActivity(), OnMapReadyCallback {
         val intent = Intent(this, MapsActivity::class.java)
         startActivity(intent)
         finish() // Finish MainActivity to prevent going back to it when pressing back button from MapsActivity
+    }
+
+    fun goToMySugg(){
+        val intent = Intent(this, ActivityCheckMySuggestions::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    fun goToMySuggestions(view: View){
+        val intent = Intent(this, ActivityCheckMySuggestions::class.java)
+        startActivity(intent)
+        finish()
     }
 
 

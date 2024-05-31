@@ -4,41 +4,50 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#16355A"
     tools:context=".ActivityCheckMySuggestions">
+
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitStart"
+        android:src="@drawable/bg_lampa" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="190dp"
+        android:gravity="center_horizontal"
+        android:text="My Suggestions"
+        android:textColor="#FFFFFF"
+        android:fontFamily="@font/font_family_nunito"
+        android:textSize="20sp"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ListView
         android:id="@+id/listViewSuggestions"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-    <ListView
-        android:id="@+id/listViewSuggestions2"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-
-    <ListView
-        android:id="@+id/listViewSuggestions3"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-
-    <ListView
-        android:id="@+id/listViewSuggestions4"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="0dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="60dp"
+        android:fontFamily="@font/font_family_nunito"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        app:layout_constraintVertical_weight="1" />
 
     <ImageView
         android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="29dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:onClick="goToMapsMain"
         android:src="@drawable/b_ic_exit"
-        android:text="X"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
                 BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                     .setSupported(true)
                     // Your server's client ID, not your Android client ID.
-                    .setServerClientId("716429145792-nt4qem3pck8hobjijbmcic1tin6qikr1.apps.googleusercontent.com")
+                    .setServerClientId("553805712925-1ob5hav1getokh95pnkqj70s11g2gg3o.apps.googleusercontent.com")
                     // Only show accounts previously used to sign in.
                     .setFilterByAuthorizedAccounts(true)
                     .build())
@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
 
         // Configure Google Sign In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("1086149395268-vs2atf4tg5vaafi17ftk079stsnj5k2u.apps.googleusercontent.com")
+            .requestIdToken("553805712925-1ob5hav1getokh95pnkqj70s11g2gg3o.apps.googleusercontent.com")
             .requestEmail()
             .build()
 

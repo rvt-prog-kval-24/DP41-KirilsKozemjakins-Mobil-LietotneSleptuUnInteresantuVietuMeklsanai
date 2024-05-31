@@ -74,6 +74,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
 
     private lateinit var db: FirebaseFirestore
 
+    private lateinit var loadingLayout: LinearLayout
+
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -88,14 +92,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         logoutBtn = findViewById(R.id.idBtnLogOut)
 
         sharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
-        val username = sharedPreferences.getString(USER_NAME_KEY, null)
 
-        // Set the username to TextView
-        userTV.text = "Welcome, $username!"
+        loadingLayout = findViewById(R.id.loadingLayout)
+
+        val user = auth.currentUser
+        val userID = user?.uid ?: ""
+
+        db.collection("Users").document(userID)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val username = document.getString("name").orEmpty()
+
+                    userTV.text = "Welcome, $username!"
+                } else {
+                    userTV.text = "Welcome, who are you???"
+                }
+            }
+
 
         logoutBtn.setOnClickListener {
             // Sign out from Firebase Authentication
-            auth.signOut()
+
 
             // Clear SharedPreferences data
             val editor: SharedPreferences.Editor = sharedPreferences.edit()
@@ -105,6 +123,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
             // Start MainActivity
             val intent = Intent(this@MapsActivity, MainActivity::class.java)
             startActivity(intent)
+            auth.signOut()
 
             // Finish the current activity
             finish()
@@ -124,7 +143,49 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         findViewById<Button>(R.id.applyTagFilterButton).setOnClickListener {
             applyTagFilter()
         }
+
+        fetchInitialData()
     }
+
+
+
+    private fun fetchInitialData() {
+        // Fetch user data
+        fetchUserData { success ->
+            if (success) {
+
+                    // Hide the loading layout once all data is loaded
+                    loadingLayout.visibility = View.GONE
+
+            } else {
+                // Handle error
+                Toast.makeText(this, "Failed to load user data.", Toast.LENGTH_SHORT).show()
+                // Optionally, navigate back to the login screen
+            }
+        }
+    }
+
+    private fun fetchUserData(callback: (Boolean) -> Unit) {
+        val user = auth.currentUser
+        val userID = user?.uid ?: ""
+
+        db.collection("Users").document(userID)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val username = document.getString("name").orEmpty()
+                    userTV.text = "Welcome, $username!"
+                    callback(true)
+                } else {
+                    userTV.text = "Welcome, who are you???"
+                    callback(false)
+                }
+            }
+            .addOnFailureListener {
+                callback(false)
+            }
+    }
+
 
     private fun toggleTagFilterLayout() {
         if (tagFilterLayout.visibility == View.GONE) {
@@ -251,7 +312,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
             MarkerOptions()
                 .position(currentLatLng)
                 .title("Your Location")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_current_location_cat))
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_current_location))
         )
     }
 
@@ -314,16 +375,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
+            googleMap.isMyLocationEnabled = true
             fusedLocationProviderClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
                     if (location != null) {
                         val currentLatLng = LatLng(location.latitude, location.longitude)
 
-                        CurrentLocationMarker = mMap.addMarker(
-                            MarkerOptions()
-                                .position(currentLatLng)
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_current_location_cat))
-                        )
+
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
+
                     }
                 }
                 .addOnFailureListener { e: Exception ->
@@ -463,46 +523,62 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
     }
 
     private fun registerVisit(marker: Marker) {
-        val markerTag = marker.tag as? MarkerTag
-        val placeID = markerTag?.placeID
-        val userID = FirebaseAuth.getInstance().currentUser!!.uid
+
+        if (marker != null) {
+
+            val markerTag = marker.tag as? MarkerTag
+
+            if (markerTag != null) {
+                val placeID = markerTag.placeID
 
 
+                val currentUser = FirebaseAuth.getInstance().currentUser
+                if (currentUser != null) {
+                    val userID = currentUser.uid
 
 
-        // Prepare reference to user's Visited subcollection
-        val visitedRef = db.collection("Users").document(userID).collection("Visited");
+                    // Prepare reference to user's Visited subcollection
+                    val visitedRef = db.collection("Users").document(userID).collection("Visited");
 
-        if (placeID != null) {
-            // Check if place has already been visited
-            visitedRef.document(placeID).get()
-                .addOnSuccessListener { documentSnapshot ->
-                    if (!documentSnapshot.exists()) { // Place not visited yet
-                        // Create a new document for the visited place
-                        val visitDoc = visitedRef.document(placeID);
+                    if (placeID != null) {
+                        // Check if place has already been visited
+                        visitedRef.document(placeID).get()
+                            .addOnSuccessListener { documentSnapshot ->
+                                if (!documentSnapshot.exists()) { // Place not visited yet
+                                    // Create a new document for the visited place
+                                    val visitDoc = visitedRef.document(placeID);
 
-                        Toast.makeText(this, "YAY ${placeID}", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this, "YAY ${placeID}", Toast.LENGTH_SHORT).show()
 
 
-                        // Set data for the visited place document (e.g., placeID and visit timestamp)
-                        visitDoc.set(hashMapOf(
-                            "placeID" to placeID,
-                            "visitTime" to FieldValue.serverTimestamp()
-                        ))
-                            .addOnSuccessListener { aVoid: Void? ->
-                                // Update VisitedPlaces in UserStats (assuming a separate collection)
-                                updateVisitedPlacesCount(userID, 1)
+                                    // Set data for the visited place document (e.g., placeID and visit timestamp)
+                                    visitDoc.set(hashMapOf(
+                                        "placeID" to placeID,
+                                        "visitTime" to FieldValue.serverTimestamp()
+                                    ))
+                                        .addOnSuccessListener { aVoid: Void? ->
+                                            // Update VisitedPlaces in UserStats (assuming a separate collection)
+                                            updateVisitedPlacesCount(userID, 1)
+                                        }
+                                }
+                            }
+                            .addOnFailureListener { e ->
+                                Log.w(
+                                    "MapsActivity",
+                                    "Error checking for visited place",
+                                    e
+                                )
                             }
                     }
+                } else {
+                    // Handle the case when there is no current user signed in
                 }
-                .addOnFailureListener { e ->
-                    Log.w(
-                        "MapsActivity",
-                        "Error checking for visited place",
-                        e
-                    )
-                }
+
+
+
+            }
         }
+
     }
 
     private fun updateVisitedPlacesCount(userID: String, increment: Int) {

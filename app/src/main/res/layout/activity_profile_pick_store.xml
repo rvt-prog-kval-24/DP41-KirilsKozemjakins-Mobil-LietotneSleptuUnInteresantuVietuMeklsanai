@@ -18,10 +18,11 @@
         android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/font_family_nunito"
+
         android:gravity="center_horizontal"
         android:layout_marginTop="218dp"
         android:text="Profile Pictures"
+        android:fontFamily="@font/font_family_nunito"
         android:textColor="#FFFFFF"
         android:textSize="20sp"
         app:layout_constraintTop_toTopOf="parent"
