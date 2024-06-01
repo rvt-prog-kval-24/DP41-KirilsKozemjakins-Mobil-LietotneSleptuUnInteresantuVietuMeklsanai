@@ -49,7 +49,7 @@ import kotlinx.coroutines.runBlocking
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
 
     private lateinit var mMap: GoogleMap
-    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var placeNameTextView: TextView
     private lateinit var placeDescriptionTextView: TextView
     private lateinit var placeAuthorTextView: TextView
@@ -224,7 +224,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
     }
 
     private fun initializeBottomSheet() {
-        val bottomSheet: LinearLayout = findViewById(R.id.bottomSheet)
+        val bottomSheet: ConstraintLayout = findViewById(R.id.bottomSheet)
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
 
         placeNameTextView = findViewById(R.id.placeName)
@@ -474,6 +474,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         }
 
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+
 
 
     }

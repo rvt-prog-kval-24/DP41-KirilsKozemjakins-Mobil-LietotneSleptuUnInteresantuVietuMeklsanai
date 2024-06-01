@@ -260,14 +260,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
+
         <!-- Bottom Sheet Layout -->
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/bottomSheet"
             android:layout_width="match_parent"
             android:layout_height="600dp"
             android:layout_gravity="bottom"
-            android:orientation="vertical"
             android:background="#16355A"
+            android:orientation="vertical"
             app:behavior_hideable="true"
             app:behavior_peekHeight="0dp"
             app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
@@ -275,38 +277,52 @@
 
             <TextView
                 android:id="@+id/placeName"
-                android:layout_width="match_parent"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:padding="16dp"
-                android:textColor="#FFFFFF"
                 android:fontFamily="@font/font_family_nunito"
-                android:text="Place Name"/>
+                android:padding="16dp"
+                android:text="Place Name"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/placeImage"
+                app:layout_constraintTop_toTopOf="@+id/placeImage" />
 
             <TextView
                 android:id="@+id/placeDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:textColor="#FFFFFF"
                 android:fontFamily="@font/font_family_nunito"
-                android:text="Place Description"/>
+                android:padding="16dp"
+                android:text="Place Description"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="100dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/placeAuthor" />
 
             <TextView
                 android:id="@+id/placeAuthor"
-                android:layout_width="match_parent"
+                android:layout_width="80dp"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:textColor="#FFFFFF"
                 android:fontFamily="@font/font_family_nunito"
-                android:text="Place Author"/>
+                android:padding="16dp"
+                android:text="Place Author"
+                android:textColor="#FFFFFF"
+                app:layout_constraintStart_toStartOf="@+id/placeName"
+                app:layout_constraintTop_toBottomOf="@+id/placeName" />
 
             <ImageView
                 android:id="@+id/placeImage"
-                android:layout_width="match_parent"
-                android:layout_height="500dp"
-                android:scaleType="fitCenter"/>
-        </LinearLayout>
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="30dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
