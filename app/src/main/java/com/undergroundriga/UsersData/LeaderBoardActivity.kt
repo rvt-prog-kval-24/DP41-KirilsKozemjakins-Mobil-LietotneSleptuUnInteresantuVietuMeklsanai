@@ -12,19 +12,23 @@ import android.widget.TextView
 import com.google.firebase.firestore.FirebaseFirestore
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import com.bumptech.glide.Glide
 import com.google.firebase.firestore.Query
-import com.undergroundriga.R
+import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
 
 data class LeaderboardItem(
     val userId: String,
     val username: String,
-    val acceptedSubmissions: Int
+    val acceptedSubmissions: Int,
+    val profilePictureUrl: String
 )
 
 class LeaderBoardActivity : AppCompatActivity() {
 
     private lateinit var leaderboardList: ListView
     private lateinit var firestore: FirebaseFirestore
+    private val defaultProfilePictureUrl = "URL_OF_YOUR_DEFAULT_PICTURE" // Replace with actual URL or resource
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,10 +57,15 @@ class LeaderBoardActivity : AppCompatActivity() {
             val usernameTextView = view.findViewById<TextView>(R.id.username)
             val userAcceptedSubmTextView = view.findViewById<TextView>(R.id.user_AcceptedSubm)
 
-            userImage.setImageResource(R.drawable.default_prof_pick) // Placeholder image
+            // Load the profile picture into ImageView using Glide
+            Glide.with(context)
+                .load(leaderboardItem.profilePictureUrl)
+                .placeholder(R.drawable.default_prof_pick) // Placeholder image while loading
+                .error(R.drawable.default_prof_pick) // Error image if loading fails
+                .into(userImage)
 
             usernameTextView.text = leaderboardItem.username
-            userAcceptedSubmTextView.text = leaderboardItem.acceptedSubmissions.toString()
+            userAcceptedSubmTextView.text = "Accepted submissions: " + leaderboardItem.acceptedSubmissions.toString()
 
             return view
         }
@@ -68,37 +77,48 @@ class LeaderBoardActivity : AppCompatActivity() {
             .orderBy("AcceptedSubm", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { documentsSnapshot ->
-                val tasks = documentsSnapshot.map { document ->
-                    val userId = document.getString("UserID") ?: ""
-                    val acceptedSubmissions = document.getLong("AcceptedSubm")?.toInt() ?: 0
+                GlobalScope.launch(Dispatchers.Main) {
+                    documentsSnapshot.forEach { document ->
+                        val userId = document.getString("UserID") ?: ""
+                        val acceptedSubmissions = document.getLong("AcceptedSubm")?.toInt() ?: 0
 
-                    // Fetch the username from the Users table
-                    firestore.collection("Users").document(userId)
-                        .get()
-                        .continueWith { task ->
-                            val username = if (task.isSuccessful) {
-                                task.result?.getString("name") ?: "Unknown"
-                            } else {
-                                "Unknown"
-                            }
-                            LeaderboardItem(userId, username, acceptedSubmissions)
-                        }
-                }
+                        val username = fetchUsername(userId)
+                        val profilePictureUrl = fetchProfilePictureUrl(userId) ?: defaultProfilePictureUrl
 
-                // Wait for all username fetch tasks to complete
-                tasks.forEach { task ->
-                    task.addOnCompleteListener { completedTask ->
-                        if (completedTask.isSuccessful) {
-                            leaderboardItems.add(completedTask.result!!)
-                            // Update the adapter only once all tasks are complete
-                            if (leaderboardItems.size == tasks.size) {
-                                val adapter = LeaderboardAdapter(this@LeaderBoardActivity, leaderboardItems)
-                                leaderboardList.adapter = adapter
-                            }
+                        val leaderboardItem = LeaderboardItem(userId, username, acceptedSubmissions, profilePictureUrl)
+                        leaderboardItems.add(leaderboardItem)
+
+                        if (leaderboardItems.size == documentsSnapshot.size()) {
+                            val adapter = LeaderboardAdapter(this@LeaderBoardActivity, leaderboardItems)
+                            leaderboardList.adapter = adapter
                         }
                     }
                 }
             }
+    }
+
+    private suspend fun fetchUsername(userId: String): String {
+        return try {
+            val userDoc = firestore.collection("Users").document(userId).get().await()
+            userDoc.getString("name") ?: "Unknown"
+        } catch (e: Exception) {
+            "Unknown"
+        }
+    }
+
+    private suspend fun fetchProfilePictureUrl(userId: String): String? {
+        return try {
+            val userDoc = firestore.collection("Users").document(userId).get().await()
+            val picId = userDoc.getString("CurrentPickID")
+            if (picId != null) {
+                val picDoc = firestore.collection("ProfPictures").document(picId).get().await()
+                picDoc.getString("ProfPickURL")
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
+        }
     }
 
     fun goBackToMaps(view: View) {

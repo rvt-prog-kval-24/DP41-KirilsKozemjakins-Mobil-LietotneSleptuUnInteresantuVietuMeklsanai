@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1086149395268-i37kqd8ar3epuo1qqikeqgtk1ushd6ve.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.underground.riga.app",
+            "certificate_hash": "011dd5326b008a63d24f2857822e33b0a69e9dd4"
+          }
+        },
+        {
           "client_id": "1086149395268-oji3l6dtoguqc6tj0d232j8firkg8sfg.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -100,6 +100,9 @@ class ProfilePictureAdapter(private val context: ProfilePickStoreActivity) : Rec
 
         positiveButton.setOnClickListener {
             // Set CurrentPickID in Users collection for current user
+
+
+
             updateCurrentPickID(profilePicture.id)
             dialog.dismiss()
         }
@@ -124,6 +127,7 @@ class ProfilePictureAdapter(private val context: ProfilePickStoreActivity) : Rec
         userRef.update("CurrentPickID", pictureId)
             .addOnSuccessListener {
                 Toast.makeText(context, "Profile picture selected successfully!", Toast.LENGTH_SHORT).show()
+                context.refreshData() // Refresh data after updating profile picture
             }
             .addOnFailureListener {
                 Toast.makeText(context, "Failed to select profile picture!", Toast.LENGTH_SHORT).show()
@@ -146,6 +150,11 @@ class ProfilePickStoreActivity : AppCompatActivity() {
 
 
 
+    fun refreshData() {
+        val intent = Intent(this, ProfilePickStoreActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile_pick_store)
@@ -280,6 +289,8 @@ class ProfilePickStoreActivity : AppCompatActivity() {
 
                                 Toast.makeText(this, "Profile picture purchased successfully!", Toast.LENGTH_SHORT).show()
 
+                                HandleAchievements.updateUserStatsField(userId, "ProfPickPurchased", 1)
+
                                 val intent = Intent(this, ProfilePickStoreActivity::class.java)
                                 startActivity(intent)
                                 finish()
@@ -324,6 +335,12 @@ class ProfilePickStoreActivity : AppCompatActivity() {
 
     fun goBackToProf(view: View){
         val intent = Intent(this, UserProfileActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    fun goUpdate(view: View){
+        val intent = Intent(this, ProfilePickStoreActivity::class.java)
         startActivity(intent)
         finish()
     }

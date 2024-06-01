@@ -29,18 +29,32 @@
         android:textSize="20sp"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/UserProfPick"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
-        android:layout_marginTop="25dp"
-        android:onClick="goToProfPickStore"
-        android:src="@drawable/default_prof_pick"
+
+        <ImageView
+            android:id="@+id/UserProfPick"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:layout_marginTop="25dp"
+            android:onClick="goToProfPickStore"
+            android:src="@drawable/default_prof_pick"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/userName" />
 
 
+
+
+    <FrameLayout
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/profile_picture_radius_border"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userName" />
+        app:layout_constraintTop_toBottomOf="@+id/userName">
+
+    </FrameLayout>
+
 
     <TextView
         android:id="@+id/userEmailTextView"

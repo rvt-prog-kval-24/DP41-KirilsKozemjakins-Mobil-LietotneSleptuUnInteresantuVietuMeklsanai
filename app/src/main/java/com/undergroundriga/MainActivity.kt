@@ -1,33 +1,24 @@
 package com.undergroundriga
 
+import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
-
-import android.util.Log
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.auth.FirebaseAuth
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
-import com.google.firebase.auth.GoogleAuthProvider
-
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.FirebaseUser
-import android.content.Context
-import android.content.SharedPreferences
 import com.google.firebase.Timestamp
-import com.undergroundriga.ActivityReg
-
-private const val TAG = "Main"
-
-
-
-
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,16 +26,28 @@ class MainActivity : AppCompatActivity() {
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var sharedPreferences: SharedPreferences
 
-    var PREFS_KEY = "prefs"
-    var USER_ID_KEY = "user_id"
-    var USER_NAME_KEY = "user_name"
+    companion object {
+        private const val TAG = "MainActivity"
+        private const val RC_SIGN_IN = 9001
+        private const val PREFS_KEY = "prefs"
+        private const val USER_ID_KEY = "user_id"
+        private const val USER_NAME_KEY = "user_name"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val db = FirebaseFirestore.getInstance()
+        // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
+
+        // Configure Google Sign In
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken("1086149395268-oji3l6dtoguqc6tj0d232j8firkg8sfg.apps.googleusercontent.com")
+            .requestEmail()
+            .build()
+
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
         sharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
 
         val currentUser = auth.currentUser
@@ -53,34 +56,10 @@ class MainActivity : AppCompatActivity() {
             goToMapsActivity()
         }
 
-        val signInRequest = BeginSignInRequest.builder()
-            .setGoogleIdTokenRequestOptions(
-                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                    .setSupported(true)
-                    // Your server's client ID, not your Android client ID.
-                    .setServerClientId("553805712925-1ob5hav1getokh95pnkqj70s11g2gg3o.apps.googleusercontent.com")
-                    // Only show accounts previously used to sign in.
-                    .setFilterByAuthorizedAccounts(true)
-                    .build())
-            .build()
-
-        // Configure Google Sign In
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("553805712925-1ob5hav1getokh95pnkqj70s11g2gg3o.apps.googleusercontent.com")
-            .requestEmail()
-            .build()
-
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
-
-        // Initialize Firebase Auth
-        auth = FirebaseAuth.getInstance()
-
-        // Set click listener for Google Sign In button
         findViewById<Button>(R.id.googleSignInButton).setOnClickListener {
             signIn()
         }
 
-        // Set click listener for Email Sign Up button
         findViewById<Button>(R.id.emailSignUpButton).setOnClickListener {
             signUpWithEmail()
         }
@@ -100,12 +79,10 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == RC_SIGN_IN) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
-                // Google Sign In was successful, authenticate with Firebase
                 val account = task.getResult(ApiException::class.java)!!
                 Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
                 firebaseAuthWithGoogle(account.idToken!!)
             } catch (e: ApiException) {
-                // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e)
                 Toast.makeText(this, "Google sign in failed", Toast.LENGTH_SHORT).show()
             }
@@ -117,14 +94,13 @@ class MainActivity : AppCompatActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "signInWithCredential:success")
                     val user = auth.currentUser
                     updateUI(user)
                     Toast.makeText(this, "Google sign in successful", Toast.LENGTH_SHORT).show()
 
-                    // Add user data to Firestore
-                    addUserToFirestore(user)
+                    // Check if user exists before adding to Firestore
+                    checkIfUserExists(user)
 
                     // Save user ID and name in SharedPreferences
                     val editor: SharedPreferences.Editor = sharedPreferences.edit()
@@ -136,7 +112,6 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                     finish()
                 } else {
-                    // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithCredential:failure", task.exception)
                     Toast.makeText(this, "Google sign in failed", Toast.LENGTH_SHORT).show()
                     updateUI(null)
@@ -149,22 +124,39 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun addUserToFirestore(user: FirebaseUser?) {
-        // Access a Cloud Firestore instance
+    private fun checkIfUserExists(user: FirebaseUser?) {
         val db = FirebaseFirestore.getInstance()
+        val userId = user?.uid
 
-        // Get the current timestamp
-        val timestamp = (Timestamp.now()).toString()
+        userId?.let {
+            db.collection("Users").document(userId).get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        // User already exists
+                        Toast.makeText(this, "User already exists in Firestore", Toast.LENGTH_SHORT).show()
+                    } else {
+                        // User does not exist, proceed to add user to Firestore
+                        addUserToFirestore(user)
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error checking user in Firestore", Toast.LENGTH_SHORT).show()
+                    Log.w(TAG, "Error checking user in Firestore", e)
+                }
+        }
+    }
 
-        // Create a new user with a first and last name
+    private fun addUserToFirestore(user: FirebaseUser?) {
+        val db = FirebaseFirestore.getInstance()
+        val timestamp = Timestamp.now().toString()
+
         val newUser = hashMapOf(
             "name" to user?.displayName,
             "email" to user?.email,
-            "dateOfCreation" to timestamp
-            // Add more user data as needed
+            "dateOfCreation" to timestamp,
+            "CurrentPickID" to ""
         )
 
-        // Add UserStats data
         val userStats = hashMapOf(
             "UserID" to user!!.uid,
             "VisitedPlaces" to 0,
@@ -174,33 +166,23 @@ class MainActivity : AppCompatActivity() {
             "LeaderboardMaxPos" to ""
         )
 
-        // Add UserBalance data with initial balance of 100
         val userBalance = hashMapOf(
-            "UserID" to user!!.uid,
-            "Balance" to 100
+            "UserID" to user.uid,
+            "Balance" to 500
         )
 
-        db.collection("Users")
-            .document(user!!.uid)
-            .set(newUser)
+        db.collection("Users").document(user.uid).set(newUser)
             .addOnSuccessListener {
-                db.collection("UserStats")
-                    .document(user!!.uid)
-                    .set(userStats)
+                db.collection("UserStats").document(user.uid).set(userStats)
                     .addOnSuccessListener {
-                        db.collection("UserBalance")
-                            .document(user!!.uid)
-                            .set(userBalance)
+                        db.collection("UserBalance").document(user.uid).set(userBalance)
                             .addOnSuccessListener {
-                                Toast.makeText(this, "User added to Firestore", Toast.LENGTH_SHORT).show()
-                                val intent = Intent(this, ActivityLogin::class.java)
-                                startActivity(intent)
-                                finish()
+                                Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show()
                             }
                     }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error adding user to Firestore", Toast.LENGTH_SHORT).show()
+                Log.w(TAG, "Error adding user to Firestore", e)
             }
     }
 
@@ -221,11 +203,6 @@ class MainActivity : AppCompatActivity() {
     fun goToSignUp(view: View) {
         val intent = Intent(this, ActivityReg::class.java)
         startActivity(intent)
-    }
-
-    companion object {
-        private const val TAG = "GoogleActivity"
-        private const val RC_SIGN_IN = 9001
     }
 
     private fun goToMapsActivity() {
