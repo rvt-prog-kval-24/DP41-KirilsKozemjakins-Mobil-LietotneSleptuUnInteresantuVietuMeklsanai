@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/profile_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="10dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/user_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:text="UserName: "
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/font_family_nunito"/>
+
+            <TextView
+                android:id="@+id/comment_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Comment: "
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/font_family_nunito"/>
+
+            <ImageView
+                android:id="@+id/comment_mark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/font_family_nunito"/>
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <Button
+                android:id="@+id/bChangeComment"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+
+                android:fontFamily="@font/font_family_nunito"
+                android:textColor="@color/black"
+                android:backgroundTint="#A7D1D2"
+                android:text="Change" />
+
+            <Button
+                android:id="@+id/bDeleteComment"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+
+                android:fontFamily="@font/font_family_nunito"
+                android:textColor="@color/white"
+                android:backgroundTint="#AE1515"
+                android:text="Delete" />
+        </LinearLayout>
+
+    </LinearLayout>

@@ -6,22 +6,30 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Location
 import android.location.LocationListener
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -37,13 +45,14 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
-
-import kotlinx.coroutines.tasks.await
+import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Date
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
@@ -63,6 +72,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
     private lateinit var sharedPreferences: SharedPreferences
     private var CurrentLocationMarker: Marker? = null
 
+    private lateinit var commentList: ListView
+    private lateinit var etCommText: EditText
+    private lateinit var DislikeImage: ImageView
+    private lateinit var LikeImage: ImageView
+    private lateinit var bSendComment: Button
+
+    private lateinit var currentUserID: String
+
     private val ZOOM_LEVEL_INCREMENT = 1f
     private val YOUR_PERMISSION_REQUEST_CODE = 123 // Use any unique integer value
     private val PREFS_KEY = "prefs"
@@ -70,6 +87,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
 
     private lateinit var tagFilterLayout: LinearLayout
     private lateinit var ivTagFilter: ImageView
+    private lateinit var buttonCloseTags: ImageView
     private val markers = mutableListOf<Marker>()
 
     private lateinit var db: FirebaseFirestore
@@ -98,18 +116,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         val user = auth.currentUser
         val userID = user?.uid ?: ""
 
-        db.collection("Users").document(userID)
-            .get()
-            .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    val username = document.getString("name").orEmpty()
-
-                    userTV.text = "Welcome, $username!"
-                } else {
-                    userTV.text = "Welcome, who are you???"
+        if (!userID.isNullOrEmpty()) {
+            db.collection("Users").document(userID)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        val username = document.getString("name").orEmpty()
+                        userTV.text = "Welcome, $username!"
+                    } else {
+                        userTV.text = "Welcome, who are you???"
+                    }
                 }
-            }
-
+                .addOnFailureListener { e ->
+                    userTV.text = "Error retrieving user: ${e.message}"
+                }
+        } else {
+            userTV.text = "User ID is invalid."
+        }
 
         logoutBtn.setOnClickListener {
             // Sign out from Firebase Authentication
@@ -135,6 +158,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
 
         tagFilterLayout = findViewById(R.id.tagFilterLayout)
         ivTagFilter = findViewById(R.id.ivTagFilter)
+        buttonCloseTags = findViewById(R.id.buttonCloseTags)
 
         ivTagFilter.setOnClickListener {
             toggleTagFilterLayout()
@@ -144,7 +168,29 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
             applyTagFilter()
         }
 
-        fetchInitialData()
+        if (!isInternetAvailable(this) || !isLocationEnabled(this)) {
+            showAlertDialog(this,layoutInflater)
+        } else {
+            try {
+                fetchInitialData()
+                fetchTagsFromFirestore { tags ->
+                    displayTags(tags)
+                }
+
+                ivTagFilter.setOnClickListener {
+                    toggleTagFilterLayout()
+                    ivTagFilter.visibility = View.GONE
+                }
+                buttonCloseTags.setOnClickListener {
+                    toggleTagFilterLayout()
+                    ivTagFilter.visibility = View.VISIBLE
+                }
+            }catch (e: IllegalArgumentException){
+                showAlertDialog(this,layoutInflater)
+            }
+
+        }
+
     }
 
 
@@ -195,28 +241,81 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         }
     }
 
-    private fun applyTagFilter() {
+    private fun fetchTagsFromFirestore(callback: (List<String>) -> Unit) {
+        db.collection("Tags").get()
+            .addOnSuccessListener { result ->
+                val tags = result.documents.mapNotNull { it.getString("name") }
+                callback(tags)
+                Log.d("MapsActivity", "Tags: ${tags}")
+            }
+            .addOnFailureListener { exception ->
+                Log.w("MapsActivity", "Error getting tags: ", exception)
+                callback(emptyList())
+            }
+    }
+
+    private fun displayTags(tags: List<String>) {
+
+        val typefaceN = ResourcesCompat.getFont(this, R.font.font_family_nunito)
+
+        tags.forEach { tag ->
+            val checkBox = CheckBox(this).apply {
+                text = tag
+                id = View.generateViewId()
+                // Customizing the appearance of the CheckBox
+                setTextColor(ContextCompat.getColor(context, R.color.black))
+                textSize = 16f
+                setPadding(10, 10, 10, 10)
+                typeface = typefaceN
+            }
+            tagFilterLayout.addView(checkBox, tagFilterLayout.childCount - 2)
+        }
+
+    }
+
+    fun resetTagFilter(view: View) {
+        // Iterate through all the views in the tagFilterLayout
         val selectedTags = mutableListOf<String>()
-        if (findViewById<CheckBox>(R.id.tagTeashops).isChecked) selectedTags.add("#Teashops")
-        if (findViewById<CheckBox>(R.id.tagAnimeshops).isChecked) selectedTags.add("#Animeshops")
-        if (findViewById<CheckBox>(R.id.tagFood).isChecked) selectedTags.add("#Food")
-        if (findViewById<CheckBox>(R.id.tagGraffiti).isChecked) selectedTags.add("#Graffiti")
-        if (findViewById<CheckBox>(R.id.tagExotic).isChecked) selectedTags.add("#Exotic")
-        if (findViewById<CheckBox>(R.id.tagSecondHand).isChecked) selectedTags.add("#Second hand")
-        if (findViewById<CheckBox>(R.id.tagToilet).isChecked) selectedTags.add("#Toilet")
-        if (findViewById<CheckBox>(R.id.tagVinylStore).isChecked) selectedTags.add("#Vinyl store")
-        if (findViewById<CheckBox>(R.id.tagMonument).isChecked) selectedTags.add("#Monument")
+        for (i in 0 until tagFilterLayout.childCount) {
+            val view = tagFilterLayout.getChildAt(i)
+            // If the view is a CheckBox, uncheck it
+            if (view is CheckBox) {
+                view.isChecked = false
+                selectedTags.add(view.text.toString())
+            }
+        }
 
         showMarkersForSelectedTags(selectedTags)
     }
 
+
+
+    private fun applyTagFilter() {
+        val selectedTags = mutableListOf<String>()
+
+        for (i in 0 until tagFilterLayout.childCount) {
+            val view = tagFilterLayout.getChildAt(i)
+            if (view is CheckBox && view.isChecked) {
+                selectedTags.add(view.text.toString())
+            }
+        }
+
+        showMarkersForSelectedTags(selectedTags)
+    }
+
+
     private fun showMarkersForSelectedTags(selectedTags: List<String>) {
-        mMap.clear()
+
+
         for (marker in markers) {
-            val tag = marker.snippet?.split("#")?.lastOrNull()
-            if (tag != null && selectedTags.contains("#$tag")) {
+            val markerTag = marker.tag as? MarkerTag
+            val placeTag = markerTag?.placeTag
+
+            val tag = "#"+marker.snippet?.split("#")?.lastOrNull()
+
+
+            if (placeTag != null && selectedTags.contains("$placeTag")) {
                 marker.isVisible = true
-                marker.showInfoWindow()
             } else {
                 marker.isVisible = false
             }
@@ -233,7 +332,252 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         placeImageView = findViewById(R.id.placeImage)
 
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        commentList.adapter =
+            ArrayAdapter(this, R.layout.comments_list_item, ArrayList<String>())
+
+
     }
+
+
+
+    data class Comment(
+        val commentID: String, // Unique identifier for the comment
+        val userID: String, // User who posted the comment
+        val userName: String, // Username of the commenter (optional)
+        val placeID: String, // ID of the place the comment belongs to
+        val commentText: String, // Content of the comment
+        val commentMark: Long, // Content of the comment
+        val timestamp: String // Time the comment was posted (optional)
+    )
+
+
+
+    class CommentAdapter(private val context: Context, private val comments: List<Comment>) : BaseAdapter() {
+
+        override fun getCount(): Int = comments.size
+
+        override fun getItem(position: Int): Comment = comments[position]
+
+        override fun getItemId(position: Int): Long = position.toLong()
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            val view: View = convertView ?: inflateItemView(parent!!)
+
+            val comment = getItem(position)
+
+            val profileImage = view.findViewById<ImageView>(R.id.profile_image)
+            val userNameTextView = view.findViewById<TextView>(R.id.user_name)
+            val commentTextView = view.findViewById<TextView>(R.id.comment_text)
+            val commentMark = view.findViewById<ImageView>(R.id.comment_mark) // Assuming comment mark for indication
+
+            // Load profile image based on user ID (implementation depends on your data source)
+            // You can use Glide or another image loading library here.
+            // profileImage.setImageResource(R.drawable.default_profile_image) // Set default image if needed
+
+            userNameTextView.text = comment.userName
+            commentTextView.text = comment.commentText
+
+            // Handle comment mark visibility or icon based on logic (optional)
+            commentMark.visibility = View.GONE // Hide by default
+
+            // You can add functionality for the Change and Delete buttons (optional)
+            val changeButton = view.findViewById<Button>(R.id.bChangeComment)
+            val deleteButton = view.findViewById<Button>(R.id.bDeleteComment)
+
+            val db = FirebaseFirestore.getInstance()
+            val commentList = view.findViewById<ListView>(R.id.commentList)
+
+            // Set click listeners and handle change/delete logic here
+            deleteButton.setOnClickListener {
+                val commentId = comment.commentID
+                deleteComment(commentId) { success ->
+                    if (success) {
+                        val updatedComments = comments.toMutableList().apply { removeAt(position) }
+                        val adapter = CommentAdapter(context, updatedComments)
+                        commentList.adapter = adapter
+                    } else {
+                        // Handle delete failure (e.g., show a toast message)
+                        Toast.makeText(context, "Error deleting comment!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            return view
+        }
+
+        fun deleteComment(commentId: String, callback: (Boolean) -> Unit) {
+            val db = FirebaseFirestore.getInstance()
+            db.collection("Comments").document(commentId)
+                .delete()
+                .addOnSuccessListener {
+                    callback(true)
+                }
+                .addOnFailureListener { e ->
+                    Log.w("CommentAdapter", "Error deleting comment: ", e)
+                    callback(false)
+                }
+        }
+
+        private fun inflateItemView(parent: ViewGroup): View {
+            val inflater = LayoutInflater.from(parent.context)
+            return inflater.inflate(R.layout.comments_list_item, parent, false)
+        }
+    }
+
+
+
+
+    private fun showBottomSheet(marker: Marker) {
+        val placeName = marker.title
+        val placeDescription = marker.snippet
+        val markerTag = marker.tag as? MarkerTag
+        val photoURL = markerTag?.photoURL
+        val AuthorID = markerTag?.authorID
+
+
+
+
+        placeNameTextView.text = placeName
+        placeDescriptionTextView.text = placeDescription
+
+        // Load the image using Glide
+        if (!photoURL.isNullOrEmpty()) {
+            Glide.with(this)
+                .load(photoURL)
+                .into(placeImageView)
+        } else {
+            placeImageView.setImageResource(R.drawable.ic_bright_lampa_menu) // Set a default image if photoURL is empty
+        }
+
+        // Fetch and display author's name
+        if (!AuthorID.isNullOrEmpty()) {
+            val db = FirebaseFirestore.getInstance()
+
+            db.collection("Users").document(AuthorID)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        val authorName = document.getString("name").orEmpty()
+                        placeAuthorTextView.text ="added by "+ authorName
+                    } else {
+                        placeAuthorTextView.text = "added by team of Underground Riga"
+                    }
+                }
+                .addOnFailureListener { e ->
+                    placeAuthorTextView.text = "Error fetching author"
+                    Log.e("MapsActivity", "Error fetching author: ${e.message}")
+                }
+        } else {
+            placeAuthorTextView.text = "added by team of Underground Riga"
+        }
+
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+        val placeID = markerTag?.placeID
+
+        if (placeID != null) {
+            fetchComments(placeID)
+        }
+
+        // Set like/dislike button click listeners
+
+        // Set like/dislike button click listeners
+        DislikeImage.setOnClickListener { v: View? ->
+            handleLikeDislike(
+                marker,
+                0
+            )
+        }
+        LikeImage.setOnClickListener { v: View? ->
+            handleLikeDislike(
+                marker,
+                1
+            )
+        }
+
+        // Set send comment button click listener
+
+        // Set send comment button click listener
+        bSendComment.setOnClickListener { v: View? ->
+            sendComment(
+                marker
+            )
+        }
+
+
+    }
+
+    private fun fetchComments(placeID: String) {
+        val comments: MutableList<Comment> = ArrayList()
+
+        db.collection("Comments")
+            .whereEqualTo("placeID", placeID)
+            .get()
+            .addOnSuccessListener { commentsSnapshot ->
+                for (commentDoc in commentsSnapshot.documents) {
+                    val commentID = commentDoc.id
+                    val userID = commentDoc.getString("userID") ?: ""
+                    val commentText = commentDoc.getString("commentText") ?: ""
+                    val commentMark = commentDoc.getLong("commentMark") ?: 0L
+                    val timestamp = commentDoc.getString("dateTime") ?: ""
+
+                    // Extract username later using a separate call (optional)
+                    val userName = "" // Placeholder for username (not retrieved here)
+
+                    comments.add(Comment(commentID, userID, userName, placeID, commentText, commentMark,timestamp))
+                }
+
+                // Update adapter with fetched comments (usernames can be fetched later)
+                val adapter = CommentAdapter(this, comments)
+                commentList.adapter = adapter
+
+            }
+            .addOnFailureListener { e ->
+                Log.w("MapsActivity", "Error fetching comments: ", e)
+            }
+    }
+
+
+    private fun handleLikeDislike(marker: Marker, likeDislike: Int) {
+        // Update drawable based on selection (like_selected_color or dislike_selected_color)
+        val dislikeSelectedDrawable = resources.getDrawable(R.drawable.dislike_selected_color)
+        val likeSelectedDrawable = resources.getDrawable(R.drawable.like_selected_color)
+        DislikeImage.setImageResource(if (likeDislike == 0) R.drawable.dislike_selected_color else R.drawable.dislike)
+        LikeImage.setImageResource(if (likeDislike == 1) R.drawable.like_selected_color else R.drawable.like)
+
+    }
+
+    private fun sendComment(marker: Marker) {
+        val commentText = etCommText.text.toString()
+        val markerTag = marker.tag as? MarkerTag
+        val placeID = markerTag?.placeID
+        val commentMark = if (DislikeImage.drawable === resources.getDrawable(R.drawable.dislike_selected_color)) 0 else 1
+        val dateTime = SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(Date())
+
+        updateUserBalance(currentUserID,-10)
+        // Option 1: Store like/dislike choice in a separate field within the "Comments" collection
+        val commentData = hashMapOf(
+            "userID" to currentUserID,
+            "placeID" to placeID,
+            "commentText" to commentText,
+            "commentMark" to commentMark,
+            "dateTime" to dateTime
+        )
+
+
+        db.collection("Comments")  // Update collection name based on your choice (Comments or UserLikes)
+            .add(commentData)  // Update data based on your choice (commentData or userLikeData)
+            .addOnSuccessListener { documentReference ->
+                Toast.makeText(this, "Comment sent!", Toast.LENGTH_SHORT).show()
+                etCommText.text.clear()  // Clear comment text after successful submission
+            }
+            .addOnFailureListener { e ->
+                Log.w("MapsActivity", "Error sending comment: ", e)
+            }
+    }
+
+
+
 
     private fun initializeViews() {
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -246,6 +590,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
 
         ivFocusOnLocation.setOnClickListener {
             focusOnUserLocation()
+        }
+
+        commentList = findViewById(R.id.commentList);
+        etCommText = findViewById(R.id.etCommText);
+        DislikeImage = findViewById(R.id.DislikeImage);
+        LikeImage = findViewById(R.id.LikeImage);
+        bSendComment = findViewById(R.id.bSendComment);
+
+        val currentUser = FirebaseAuth.getInstance().currentUser
+
+        if (currentUser != null) {
+            currentUserID = currentUser.uid
         }
     }
 
@@ -340,7 +696,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
             // Add a custom info window with the image from photoURL
 
             val marker = mMap.addMarker(markerOptions)
-            marker?.tag = MarkerTag(photoURL, AuthorID, placeID)
+            marker?.tag = MarkerTag(photoURL, AuthorID, placeID, tag)
             marker?.let { markers.add(it) }
 
             // Add place ID to the marker snippet (assuming you have a way to store it)
@@ -350,7 +706,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         }
     }
 
-    data class MarkerTag(val photoURL: String, val authorID: String, val placeID: String)
+    data class MarkerTag(val photoURL: String, val authorID: String, val placeID: String, val placeTag: String)
 
 
 
@@ -429,55 +785,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
     }
 
 
-    private fun showBottomSheet(marker: Marker) {
-        val placeName = marker.title
-        val placeDescription = marker.snippet
-        val markerTag = marker.tag as? MarkerTag
-        val photoURL = markerTag?.photoURL
-        val AuthorID = markerTag?.authorID
 
-
-
-
-        placeNameTextView.text = "Place name: "+placeName
-        placeDescriptionTextView.text = "Description: "+placeDescription
-
-        // Load the image using Glide
-        if (!photoURL.isNullOrEmpty()) {
-            Glide.with(this)
-                .load(photoURL)
-                .into(placeImageView)
-        } else {
-            placeImageView.setImageResource(R.drawable.ic_bright_lampa_menu) // Set a default image if photoURL is empty
-        }
-
-        // Fetch and display author's name
-        if (!AuthorID.isNullOrEmpty()) {
-            val db = FirebaseFirestore.getInstance()
-
-            db.collection("Users").document(AuthorID)
-                .get()
-                .addOnSuccessListener { document ->
-                    if (document != null && document.exists()) {
-                        val authorName = document.getString("name").orEmpty()
-                        placeAuthorTextView.text = "Author: "+authorName
-                    } else {
-                        placeAuthorTextView.text = "Unknown Author"
-                    }
-                }
-                .addOnFailureListener { e ->
-                    placeAuthorTextView.text = "Error fetching author"
-                    Log.e("MapsActivity", "Error fetching author: ${e.message}")
-                }
-        } else {
-            placeAuthorTextView.text = "Unknown Author"
-        }
-
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-
-
-
-    }
 
 
 
@@ -549,7 +857,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
                                     // Create a new document for the visited place
                                     val visitDoc = visitedRef.document(placeID);
 
-                                    Toast.makeText(this, "YAY ${placeID}", Toast.LENGTH_SHORT).show()
+                                    updateUserBalance(userID,100)
 
 
                                     // Set data for the visited place document (e.g., placeID and visit timestamp)

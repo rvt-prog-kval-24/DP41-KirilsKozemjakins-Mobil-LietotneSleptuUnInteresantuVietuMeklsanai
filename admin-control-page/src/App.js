@@ -14,6 +14,7 @@ import MainPage from './components/MainPage.jsx';
 import PlacesDataPage from './components/WorkWithData/PlacesDataPage.jsx';
 import SuggestionsDataPage from './components/WorkWithData/SuggestionsDataPage.jsx';
 import AchievementsDataPage from './components/WorkWithData/AchievementsDataPage.jsx'
+import CommentsDataPage from './components/WorkWithData/CommentsDataPage.jsx'
 import ProfilePickDataPage from './components/WorkWithData/ProfilePickDataPage.jsx';
 
 import UsersDataPage from './components/WorkWithData/UsersDataPage.jsx';
@@ -35,9 +36,10 @@ function Navbar({ isLoggedIn }) {
           <Menu.Item key="3"><Link to="/places_data">Places</Link></Menu.Item>
           <Menu.Item key="4"><Link to="/suggestions_data">Suggestions</Link></Menu.Item>
           <Menu.Item key="5"><Link to="/achievements_data">Achievements</Link></Menu.Item>
-          <Menu.Item key="6"><Link to="/prof_pick_data">Profile Pictures</Link></Menu.Item>
-          <Menu.Item key="7"><Link to="/users_data">Users</Link></Menu.Item>
-          <Menu.Item key="8"><Link to="/admin_data">Admins</Link></Menu.Item>
+          <Menu.Item key="6"><Link to="/comments_data">Users comments</Link></Menu.Item>
+          <Menu.Item key="7"><Link to="/prof_pick_data">Profile Pictures</Link></Menu.Item>
+          <Menu.Item key="8"><Link to="/users_data">Users</Link></Menu.Item>
+          <Menu.Item key="9"><Link to="/admin_data">Admins</Link></Menu.Item>
         </>
       )}
     </Menu>
@@ -118,6 +120,7 @@ function App() {
             <Route path="/main_page"  element={ isLoggedIn ? <MainPage /> : <Navigate to="/" replace />}/>
             <Route path="/places_data" element={isLoggedIn ? <PlacesDataPage /> : <Navigate to="/" replace />}/>
             <Route path="/suggestions_data" element={isLoggedIn ? <SuggestionsDataPage />: <Navigate to="/" replace />}/>
+            <Route path="/comments_data" element={isLoggedIn ? <CommentsDataPage />: <Navigate to="/" replace />}/>
             <Route path="/achievements_data" element={isLoggedIn ? <AchievementsDataPage />: <Navigate to="/" replace />}/>
             <Route path="/prof_pick_data" element={isLoggedIn ? <ProfilePickDataPage />: <Navigate to="/" replace />}/>
             <Route path="/users_data" element={isLoggedIn ? <UsersDataPage />: <Navigate to="/" replace />}/>
