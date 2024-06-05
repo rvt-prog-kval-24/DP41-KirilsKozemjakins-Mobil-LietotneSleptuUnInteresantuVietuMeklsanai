@@ -117,7 +117,7 @@ function App() {
           <Breadcrumb style={{ margin: '16px 0' }}></Breadcrumb>
           <Routes>
             <Route path="/" element={<LandingPage setIsLoggedIn={setIsLoggedIn} />} />
-            <Route path="/main_page"  element={ isLoggedIn ? <MainPage /> : <Navigate to="/" replace />}/>
+            <Route path="/main_page"  element={isLoggedIn ? <MainPage /> : <Navigate to="/" replace />}/>
             <Route path="/places_data" element={isLoggedIn ? <PlacesDataPage /> : <Navigate to="/" replace />}/>
             <Route path="/suggestions_data" element={isLoggedIn ? <SuggestionsDataPage />: <Navigate to="/" replace />}/>
             <Route path="/comments_data" element={isLoggedIn ? <CommentsDataPage />: <Navigate to="/" replace />}/>
