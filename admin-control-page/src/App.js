@@ -1,13 +1,12 @@
-// App.jsx
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import { Button, Breadcrumb, Layout, Menu } from 'antd';
+import { Button, Breadcrumb, Layout, Menu, Spin } from 'antd';
 import { EnvironmentOutlined } from '@ant-design/icons';
 import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { onAuthStateChanged, signOut, getAuth } from 'firebase/auth';
-import { collection, query, where, getDocs, updateDoc, serverTimestamp } from 'firebase/firestore'; // Moved import here
+import { collection, query, where, getDocs, updateDoc, serverTimestamp } from 'firebase/firestore';
 
-import { auth, db } from './components/DataBase/firebase'; // Import auth and db
+import { auth, db } from './components/DataBase/firebase';
 import LandingPage from './components/LandingPage.jsx';
 import MainPage from './components/MainPage.jsx';
 
@@ -20,15 +19,14 @@ import ProfilePickDataPage from './components/WorkWithData/ProfilePickDataPage.j
 import UsersDataPage from './components/WorkWithData/UsersDataPage.jsx';
 import AdminsDataPage from './components/WorkWithData/AdminDataPage.jsx';
 
-
-import withAuth from './components/auth/withAuth'; // Import withAuth HOC
-import { clearSession } from './components/auth/session'; // Import session utility
+import withAuth from './components/auth/withAuth';
+import { clearSession } from './components/auth/session';
 
 const { Header, Content, Footer } = Layout;
 
 function Navbar({ isLoggedIn }) {
   return (
-    <Menu theme="dark" mode="horizontal"  style={{ flex: 1, minWidth: 0 }}>
+    <Menu theme="dark" mode="horizontal" style={{ flex: 1, minWidth: 0 }}>
       <Menu.Item key="1"><Link to="/">Landing Page</Link></Menu.Item>
       {isLoggedIn && (
         <>
@@ -54,6 +52,7 @@ function Logo() {
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -62,6 +61,7 @@ function App() {
       } else {
         setIsLoggedIn(false);
       }
+      setIsLoading(false); // Auth check is complete
     });
 
     return () => unsubscribe();
@@ -69,39 +69,40 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      // Sign out from Firebase Auth
-      const user = getAuth().currentUser; // Get current user reference (assuming user object is available)
+      const user = getAuth().currentUser;
 
       if (user) {
         const sessionEndTime = serverTimestamp();
 
-        // Update the existing UserSession document with end time
         const userSessionsCollectionRef = collection(db, 'UserSessions');
         const snapshot = await getDocs(query(userSessionsCollectionRef, where('uid', '==', user.uid)));
-        
-      
 
-        if (snapshot.empty) {
-          console.error('User session document not found');
-        } else {
+        if (!snapshot.empty) {
           const doc = snapshot.docs[0];
           await updateDoc(doc.ref, { sessionEnd: sessionEndTime });
           console.log('User session document updated');
+        } else {
+          console.error('User session document not found');
         }
       } else {
         console.error('No user logged in');
       }
 
       await signOut(auth);
-
       clearSession();
-
       setIsLoggedIn(false);
     } catch (error) {
       console.error('Error logging out:', error);
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="loading-container">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <BrowserRouter>
@@ -117,17 +118,14 @@ function App() {
           <Breadcrumb style={{ margin: '16px 0' }}></Breadcrumb>
           <Routes>
             <Route path="/" element={<LandingPage setIsLoggedIn={setIsLoggedIn} />} />
-            <Route path="/main_page"  element={isLoggedIn ? <MainPage /> : <Navigate to="/" replace />}/>
-            <Route path="/places_data" element={isLoggedIn ? <PlacesDataPage /> : <Navigate to="/" replace />}/>
-            <Route path="/suggestions_data" element={isLoggedIn ? <SuggestionsDataPage />: <Navigate to="/" replace />}/>
-            <Route path="/comments_data" element={isLoggedIn ? <CommentsDataPage />: <Navigate to="/" replace />}/>
-            <Route path="/achievements_data" element={isLoggedIn ? <AchievementsDataPage />: <Navigate to="/" replace />}/>
-            <Route path="/prof_pick_data" element={isLoggedIn ? <ProfilePickDataPage />: <Navigate to="/" replace />}/>
-            <Route path="/users_data" element={isLoggedIn ? <UsersDataPage />: <Navigate to="/" replace />}/>
-            <Route path="/admin_data" element={isLoggedIn ? <AdminsDataPage />: <Navigate to="/" replace />}/>
-
-
-            
+            <Route path="/main_page" element={isLoggedIn ? <MainPage /> : <Navigate to="/" replace />} />
+            <Route path="/places_data" element={isLoggedIn ? <PlacesDataPage /> : <Navigate to="/" replace />} />
+            <Route path="/suggestions_data" element={isLoggedIn ? <SuggestionsDataPage /> : <Navigate to="/" replace />} />
+            <Route path="/comments_data" element={isLoggedIn ? <CommentsDataPage /> : <Navigate to="/" replace />} />
+            <Route path="/achievements_data" element={isLoggedIn ? <AchievementsDataPage /> : <Navigate to="/" replace />} />
+            <Route path="/prof_pick_data" element={isLoggedIn ? <ProfilePickDataPage /> : <Navigate to="/" replace />} />
+            <Route path="/users_data" element={isLoggedIn ? <UsersDataPage /> : <Navigate to="/" replace />} />
+            <Route path="/admin_data" element={isLoggedIn ? <AdminsDataPage /> : <Navigate to="/" replace />} />
           </Routes>
         </Content>
         <Footer style={{ textAlign: 'center' }}>UndergroundRiga ©{new Date().getFullYear()} Created by KirilsK</Footer>

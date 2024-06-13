@@ -83,3 +83,10 @@ input {
   margin-top: 2rem;
 }
 
+.loading-container {
+  position: fixed; /* Ensure it stays on top of the content */
+  top: 50%; /* Vertical centering */
+  left: 50%; /* Horizontal centering */
+  transform: translate(-50%, -50%); /* Adjust centering based on element size */
+  z-index: 999; /* Ensure loading indicator is displayed above the page content */
+}

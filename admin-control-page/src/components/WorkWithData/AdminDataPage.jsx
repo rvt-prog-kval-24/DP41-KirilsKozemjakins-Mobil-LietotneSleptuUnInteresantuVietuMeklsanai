@@ -1,8 +1,8 @@
 // AdminsPage.jsx
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Select, Form, Input, Button, Space, Table, Popconfirm } from 'antd';
-import { addDoc, collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import React, { useState, useEffect } from 'react';
+import { Select, Form, Input, Button, Space, Table, Popconfirm, message } from 'antd';
+import { addDoc, collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../DataBase/firebase'; // Assuming you have a separate file for Firebase configuration
 
 const AdminsPage = () => {
@@ -33,8 +33,6 @@ const AdminsPage = () => {
 
   useEffect(() => {
     // Fetch users and admins on component mount
-
-
     fetchUsers();
     fetchAdmins();
   }, []);
@@ -62,17 +60,14 @@ const AdminsPage = () => {
   };
 
   const handleDeleteAdmin = async (adminId) => {
-    const confirmDelete = await Popconfirm({
-      title: 'Are you sure you want to delete this admin?',
-      onConfirm: async () => {
-        await deleteDoc(doc(db, 'Admins', adminId));
-        setEditingAdminId(null);
-        fetchAdmins(); // Update admins list after deleting
-      },
-    })();
-
-    if (!confirmDelete) {
-      return;
+    try {
+      await deleteDoc(doc(db, 'Admins', adminId));
+      setEditingAdminId(null);
+      fetchAdmins(); // Update admins list after deleting
+      message.success('Admin deleted successfully');
+    } catch (error) {
+      console.error('Error deleting admin:', error);
+      message.error('Failed to delete admin');
     }
   };
 
@@ -100,6 +95,8 @@ const AdminsPage = () => {
               <Popconfirm
                 title="Are you sure you want to delete this admin?"
                 onConfirm={() => handleDeleteAdmin(adminId)}
+                okText="Yes"
+                cancelText="No"
               >
                 <Button type="link" danger>
                   Delete
@@ -126,25 +123,23 @@ const AdminsPage = () => {
             placeholder="Select a user"
             optionFilterProp="children"
             onChange={handleUserSelect}
-            filterOption={(input,          // Continued code
-            option) =>
+            filterOption={(input, option) =>
               option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
             }
-            >
-              {users.map((user) => (
-                <Select.Option key={user.id} value={user.id}>
-                  {user.email}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Button type="primary" onClick={handleAddAdmin} disabled={!selectedUser}>
-            Add Admin
-          </Button>
-        </Form>
-      </div>
-    );
-  };
-  
-  export default AdminsPage;
-  
+          >
+            {users.map((user) => (
+              <Select.Option key={user.id} value={user.id}>
+                {user.email}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+        <Button type="primary" onClick={handleAddAdmin} disabled={!selectedUser}>
+          Add Admin
+        </Button>
+      </Form>
+    </div>
+  );
+};
+
+export default AdminsPage;

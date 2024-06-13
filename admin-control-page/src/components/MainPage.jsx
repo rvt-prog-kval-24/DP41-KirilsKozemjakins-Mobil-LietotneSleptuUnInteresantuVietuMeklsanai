@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { getDocs, collection, query, where } from 'firebase/firestore';
-import { db } from './DataBase/firebase'; // Assuming you have a similar import for db
-import { Card, Statistic, Button } from 'antd'; // Using Ant Design for cards, statistics, and button
-import { Pie, Bar } from '@ant-design/charts'; // Import Pie and Bar chart components
+import React, { useState, useEffect, useCallback } from 'react';
+import { getDocs, collection } from 'firebase/firestore';
+import { db } from './DataBase/firebase';
+import { Card, Statistic, Button } from 'antd';
+import { Pie, Bar } from '@ant-design/charts';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -18,20 +18,19 @@ const MainPage = () => {
   });
 
   const [isExporting, setIsExporting] = useState(false);
+  const [isInitialFetch, setIsInitialFetch] = useState(true);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     const placesCollection = collection(db, 'Places');
     const suggestionsCollection = collection(db, 'PlacesSuggestions');
     const usersCollection = collection(db, 'Users');
 
-    // Get total places
     const placesSnapshot = await getDocs(placesCollection);
     const totalPlaces = placesSnapshot.docs.length;
 
     const usersSnapshot = await getDocs(usersCollection);
     const totalUsers = usersSnapshot.docs.length;
 
-    // Get total suggestions and count by response status
     const suggestionsSnapshot = await getDocs(suggestionsCollection);
     const totalSuggestions = suggestionsSnapshot.docs.length;
     const pendingSuggestions = suggestionsSnapshot.docs.filter(
@@ -44,13 +43,13 @@ const MainPage = () => {
       (doc) => doc.data().respond === 'negative'
     ).length;
 
-    // Get suggestions per day (assuming a `date` field)
     const suggestionsPerDay = {};
     suggestionsSnapshot.forEach((doc) => {
-      const date = doc.data().suggestionDate; // Get the date field
+      const date = doc.data().suggestionDate;
       if (date) {
         const formattedDate = new Date(date).toDateString();
-        suggestionsPerDay[formattedDate] = suggestionsPerDay[formattedDate] ? suggestionsPerDay[formattedDate] + 1 : 1;
+        suggestionsPerDay[formattedDate] =
+          suggestionsPerDay[formattedDate] ? suggestionsPerDay[formattedDate] + 1 : 1;
       }
     });
 
@@ -63,73 +62,70 @@ const MainPage = () => {
       totalUsers,
       suggestionsPerDay,
     });
-  };
+    setIsInitialFetch(false);
+  }, []);
 
   useEffect(() => {
     fetchStats();
-  }, []);
+  }, [fetchStats]);
 
   const exportToPDF = async () => {
-    setIsExporting(true); // Set loading state
+    setIsExporting(true);
 
-    const mainContent = document.getElementById('main-content'); // Target the content area
+    const mainContent = document.getElementById('main-content');
 
     try {
-      const canvas = await html2canvas(mainContent); // Generate canvas image
-
+      const canvas = await html2canvas(mainContent);
       const pdf = new jsPDF({
-        orientation: 'landscape', // Adjust if needed
+        orientation: 'landscape',
         unit: 'px',
-        format: 'a2', // Adjust paper size if needed
+        format: 'a2',
       });
 
-      const imgData = canvas.toDataURL('image/png'); // Convert canvas to base64 image data
-      pdf.addImage(imgData, 'PNG', 0, 0); // Add image to PDF
-
-      pdf.save('System_Statistics.pdf'); // Download PDF with filename
+      const imgData = canvas.toDataURL('image/png');
+      pdf.addImage(imgData, 'PNG', 0, 0);
+      pdf.save('System_Statistics.pdf');
     } catch (error) {
       console.error('Error exporting to PDF:', error);
-      // Handle errors appropriately (e.g., display an error message to the user)
     } finally {
-      setIsExporting(false); // Reset loading state
+      setIsExporting(false);
     }
   };
 
-  // Pie chart config
- const pieConfig = {
-    data: [
-     { type: 'Pending', value: stats.pendingSuggestions },
-     { type: 'Positive', value: stats.positiveSuggestions },
-     { type: 'Negative', value: stats.negativeSuggestions },
-    ],
-    angleField: 'value',
-    colorField: 'type',
-    seriesField: 'type',
-    legend: {
-     position: 'bottom', // Position legend at the bottom
-    },
-    meta: {
-     value: {
-      formatter: (v) => `${v}`, // Format value labels without decimals
-     },
-    },
-   };
-   console.log("Pending Suggestions Count after:", stats.pendingSuggestions);
-  
-  
-  
-   // Bar chart config
-   const barConfig = {
-    data: Object.entries(stats.suggestionsPerDay).map(([date, count]) => ({ date, count })),
-    xField: 'date',
-    yField: 'count',
-    meta: {
-     count: {
-      formatter: (v) => `${v}`, // Format value labels without decimals
-     },
-    },
-   };
-  
+  const pieConfig = {
+    data: [
+      { type: 'Pending', value: stats.pendingSuggestions },
+      { type: 'Positive', value: stats.positiveSuggestions },
+      { type: 'Negative', value: stats.negativeSuggestions },
+    ],
+    angleField: 'value',
+    colorField: 'type',
+    seriesField: 'type',
+    legend: {
+      position: 'bottom',
+    },
+    meta: {
+      value: {
+        formatter: (v) => `${v}`,
+      },
+    },
+  };
+
+  const barConfig = {
+    data: Object.entries(stats.suggestionsPerDay).map(([date, count]) => ({
+      date,
+      count,
+    })),
+    xField: 'date',
+    yField: 'count',
+    meta: {
+      count: {
+        formatter: (v) => `${v}`,
+      },
+    },
+  };
+
+  console.log("Pending Suggestions Count after:", stats.pendingSuggestions);
 
   return (
     <div>
@@ -139,14 +135,17 @@ const MainPage = () => {
       </Button>
       <div id="main-content">
         <div className="stats-grid">
+        
+          {!isInitialFetch && (
+            <div className="chart-container">
+              <h3>Statistic on Suggestions</h3>
+              <Pie {...pieConfig} />
+            </div>
+          )}
           <div className="chart-container">
-            <Pie {...pieConfig} />
-          </div>
-          <div className="chart-container">
+            <h3>Suggestion per day</h3>
             <Bar {...barConfig} />
-          
           </div>
-          {/* Other statistic cards */}
           <Card>
             <Statistic title="Total Places" value={stats.totalPlaces} />
           </Card>
